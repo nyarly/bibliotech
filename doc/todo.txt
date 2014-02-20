@@ -1,0 +1,19 @@
+* load DB configs from a database.yml
+* export commands: mysql
+* export commands: posgresql
+* export commands: postgis
+* import commands: mysql
+* import commands: postgresql
+* import commands: postgis
+* rake task: backup databases
+* rake task: filter dated DB backups
+* configuration: how many backups to keep of what age
+*
+* rake task: import DB locally by filename
+* rake task: import[&migrate] most recent DB (at default name) from production, locally
+* rake task: import[&migrate] most recent DB (at default name) from production, remotely
+* rake task: download and import remote sql backup
+* rake task: upload and import local backup to remote:
+*
+* cap task: download and import remote sql backup
+* cap task: upload and import local backup to remote:
