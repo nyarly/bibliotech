@@ -2,7 +2,14 @@ module BiblioTech
   class CommandGenerator
 
     class << self
+      def register(adapter_name, klass)
+        @adapter_registry ||={}
+        @adapter_registry[adapter_name] = klass
+      end
 
+      def supported_adapters
+        @adapter_registry.keys
+      end
     end
 
     def export(config, filename)

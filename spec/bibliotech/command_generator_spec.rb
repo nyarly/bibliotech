@@ -10,8 +10,31 @@ module BiblioTech
         end
       end
 
-      describe "supported_adapters" do
-        it "should return whichever adapters are registered"
+      describe "adapter lookup" do
+        class CommandOne < CommandGenerator; end;
+        class CommandTwo < CommandGenerator; end;
+        let :class_1 do CommandOne end
+        let :class_2 do CommandTwo end
+
+        context "with one class registered" do
+          before do
+            CommandGenerator.register(:type_1, CommandOne)
+          end
+          it "should list single supported adapter" do
+            CommandGenerator.supported_adapters().should == [:type_1]
+          end
+        end
+
+        context "with two classses registered" do
+          before do
+            CommandGenerator.register(:type_1, CommandOne)
+            CommandGenerator.register(:type_2, CommandTwo)
+          end
+          it "should return a single registered class" do
+            CommandGenerator.supported_adapters().should include(:type_1, :type_2)
+          end
+        end
+
       end
     end
 
