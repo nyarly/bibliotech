@@ -25,13 +25,22 @@ module BiblioTech
           end
         end
 
-        context "with two classses registered" do
+        context "with two classes registered" do
           before do
             CommandGenerator.register(:type_1, CommandOne)
             CommandGenerator.register(:type_2, CommandTwo)
           end
           it "should return a single registered class" do
             CommandGenerator.supported_adapters().should include(:type_1, :type_2)
+          end
+        end
+        context "with one class registered twice" do
+          before do
+            CommandGenerator.register(:type_1, CommandOne)
+            CommandGenerator.register(:type_1a, CommandOne)
+          end
+          it "should list single supported adapter" do
+            CommandGenerator.supported_adapters().should include(:type_1, :type1a)
           end
         end
 
