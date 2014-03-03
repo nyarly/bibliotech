@@ -24,16 +24,16 @@ module BiblioTech
 
         it { should == "pg_dump -Fc -U #{username} -d #{db_name}" }
 
-        describe 'and password', :pending => true do
+        describe 'and password' do
           let :config do base_config.merge({ :password => password }) end
 
           it { should == "PGPASSWORD=#{password} pg_dump -Fc -U #{username} -d #{db_name}" }
         end
 
-        describe 'and hostname', :pending => true do
-          let :config do base_config.merge({ :password => password }) end
+        describe 'and hostname' do
+          let :config do base_config.merge({ :host => host }) end
 
-          it { should == "pg_dump -Fc -h #{hostname} -U #{username} -d #{db_name}" }
+          it { should == "pg_dump -Fc -h #{host} -U #{username} -d #{db_name}" }
         end
       end
 
