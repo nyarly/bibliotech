@@ -16,6 +16,12 @@ module BiblioTech
         let :class_1 do CommandOne end
         let :class_2 do CommandTwo end
 
+        before do
+          CommandGenerator.class_eval do
+            @adapter_registry = nil
+          end
+        end
+
         context "with one class registered" do
           before do
             CommandGenerator.register(:type_1, CommandOne)
@@ -40,7 +46,7 @@ module BiblioTech
             CommandGenerator.register(:type_1a, CommandOne)
           end
           it "should list single supported adapter" do
-            CommandGenerator.supported_adapters().should include(:type_1, :type1a)
+            CommandGenerator.supported_adapters().should == [:type_1, :type_1a]
           end
         end
 
