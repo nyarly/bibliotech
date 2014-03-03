@@ -29,6 +29,9 @@ module BiblioTech
           it "should list single supported adapter" do
             CommandGenerator.supported_adapters().should == [:type_1]
           end
+          it "should return the correct adapter" do
+            CommandGenerator.adapter_for(:type_1).should be_a(CommandOne)
+          end
         end
 
         context "with two classes registered" do
@@ -39,6 +42,10 @@ module BiblioTech
           it "should return a single registered class" do
             CommandGenerator.supported_adapters().should include(:type_1, :type_2)
           end
+          it "should return the correct adapter" do
+            CommandGenerator.adapter_for(:type_1).should be_a(CommandOne)
+            CommandGenerator.adapter_for(:type_2).should be_a(CommandTwo)
+          end
         end
         context "with one class registered twice" do
           before do
@@ -47,6 +54,10 @@ module BiblioTech
           end
           it "should list single supported adapter" do
             CommandGenerator.supported_adapters().should == [:type_1, :type_1a]
+          end
+          it "should return the correct adapter" do
+            CommandGenerator.adapter_for(:type_1).should be_a(CommandOne)
+            CommandGenerator.adapter_for(:type_1a).should be_a(CommandOne)
           end
         end
 
