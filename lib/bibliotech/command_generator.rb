@@ -11,8 +11,8 @@ module BiblioTech
         @adapter_registry.keys
       end
 
-      def for(adapter_name)
-        @adapter_registry[adapter_name].new
+      def for(config)
+        @adapter_registry[config[:adapter]].new(config)
       end
     end
 

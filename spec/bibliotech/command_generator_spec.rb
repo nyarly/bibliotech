@@ -4,17 +4,13 @@ module BiblioTech
   describe CommandGenerator do
 
     describe "class methods" do
-      describe "for_config" do
-        it "should look up the adapter in the registry" do
-          pending
-        end
-      end
-
       describe "adapter lookup" do
         class CommandOne < CommandGenerator; end;
         class CommandTwo < CommandGenerator; end;
-        let :class_1 do CommandOne end
-        let :class_2 do CommandTwo end
+        let :class_1        do CommandOne end
+        let :class_2        do CommandTwo end
+        let :config         do { :adapter => :type_1 } end
+        let :return_adapter do double(CommandGenerator) end
 
         before do
           CommandGenerator.class_eval do
@@ -29,8 +25,9 @@ module BiblioTech
           it "should list single supported adapter" do
             CommandGenerator.supported_adapters().should == [:type_1]
           end
-          it "should return the correct adapter" do
-            CommandGenerator.for(:type_1).should be_a(CommandOne)
+          it "should return the correct adapter, instantiated with the config" do
+            CommandOne.should_receive(:new).with(config).and_return(return_adapter)
+            CommandGenerator.for(config).should == return_adapter
           end
         end
 
@@ -42,10 +39,6 @@ module BiblioTech
           it "should return a single registered class" do
             CommandGenerator.supported_adapters().should include(:type_1, :type_2)
           end
-          it "should return the correct adapter" do
-            CommandGenerator.for(:type_1).should be_a(CommandOne)
-            CommandGenerator.for(:type_2).should be_a(CommandTwo)
-          end
         end
         context "with one class registered twice" do
           before do
@@ -54,10 +47,6 @@ module BiblioTech
           end
           it "should list single supported adapter" do
             CommandGenerator.supported_adapters().should == [:type_1, :type_1a]
-          end
-          it "should return the correct adapter" do
-            CommandGenerator.for(:type_1).should be_a(CommandOne)
-            CommandGenerator.for(:type_1a).should be_a(CommandOne)
           end
         end
 
