@@ -10,6 +10,10 @@ module BiblioTech
       def supported_adapters
         @adapter_registry.keys
       end
+
+      def for(adapter_name)
+        @adapter_registry[adapter_name].new
+      end
     end
 
     def export(config, filename)

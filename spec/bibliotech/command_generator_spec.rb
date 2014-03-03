@@ -30,7 +30,7 @@ module BiblioTech
             CommandGenerator.supported_adapters().should == [:type_1]
           end
           it "should return the correct adapter" do
-            CommandGenerator.adapter_for(:type_1).should be_a(CommandOne)
+            CommandGenerator.for(:type_1).should be_a(CommandOne)
           end
         end
 
@@ -43,8 +43,8 @@ module BiblioTech
             CommandGenerator.supported_adapters().should include(:type_1, :type_2)
           end
           it "should return the correct adapter" do
-            CommandGenerator.adapter_for(:type_1).should be_a(CommandOne)
-            CommandGenerator.adapter_for(:type_2).should be_a(CommandTwo)
+            CommandGenerator.for(:type_1).should be_a(CommandOne)
+            CommandGenerator.for(:type_2).should be_a(CommandTwo)
           end
         end
         context "with one class registered twice" do
@@ -56,8 +56,8 @@ module BiblioTech
             CommandGenerator.supported_adapters().should == [:type_1, :type_1a]
           end
           it "should return the correct adapter" do
-            CommandGenerator.adapter_for(:type_1).should be_a(CommandOne)
-            CommandGenerator.adapter_for(:type_1a).should be_a(CommandOne)
+            CommandGenerator.for(:type_1).should be_a(CommandOne)
+            CommandGenerator.for(:type_1a).should be_a(CommandOne)
           end
         end
 
