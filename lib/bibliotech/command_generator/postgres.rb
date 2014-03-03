@@ -6,6 +6,7 @@ module BiblioTech
       parts << "-h #{config[:host]}"                  if config[:host]
       parts << "-U #{config[:username]}"
       parts << "-d #{config[:database]}"
+      parts << "> " + File.join(options[:path], options[:filename])  if options[:filename] and options[:path]
       parts.unshift "PGPASSWORD=#{config[:password]}" if config[:password]
       parts.join(" ")
     end
