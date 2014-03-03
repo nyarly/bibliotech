@@ -1,7 +1,7 @@
 module BiblioTech
   class CommandGenerator::Postgres < CommandGenerator
 
-    def export(config, filename = nil)
+    def export(config, options = {})
       parts = ['pg_dump -Fc']
       parts << "-h #{config[:host]}"                  if config[:host]
       parts << "-U #{config[:username]}"

@@ -16,10 +16,10 @@ module BiblioTech
       end
     end
 
-    def export(config, filename = nil)
+    def export(config, options = {})
       raise NotImplementedError
     end
-    def import(config, filename = nil)
+    def import(config, options = {})
       raise NotImplementedError
     end
     def wipe(config)
