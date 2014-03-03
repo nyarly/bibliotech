@@ -55,6 +55,12 @@ module BiblioTech
             it { should == "pg_dump -Fc -U #{username} -d #{db_name} | gzip > #{filepath}/#{filename}.gz" }
           end
         end
+
+        context 'with the whole shebang' do
+          let :options do base_options.merge({ :filename => filename, :path => filepath, :compresor => :gzip}) end
+          let :config  do base_config.merge({ :host => host, :password => password }) end
+
+        end
       end
     end
   end
