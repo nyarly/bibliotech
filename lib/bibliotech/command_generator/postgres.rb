@@ -18,11 +18,15 @@ module BiblioTech
       parts = []
 
       # TODO: modularize compressor lookup and support bunzip2 and 7zip
-      parts << "| #{options[:compressor]}" if options[:compressor] == :gzip
+      parts << "| #{options[:compressor]}" if gzip?(options)
       file = File.join(options[:path], options[:filename])
-      file << '.gz' if options[:compressor] == :gzip
+      file << '.gz' if gzip?(options)
       parts << "> " + file
       parts.join(' ').strip
+    end
+
+    def gzip?(options)
+      options[:compressor] == :gzip
     end
 
   end
