@@ -16,10 +16,10 @@ module BiblioTech
       end
     end
 
-    def export(config, filename)
+    def export(config, filename = nil)
       raise NotImplementedError
     end
-    def import(config, filename)
+    def import(config, filename = nil)
       raise NotImplementedError
     end
     def wipe(config)
@@ -34,4 +34,7 @@ module BiblioTech
 
   end
 end
+
+require 'bibliotech/command_generator/postgres'
+require 'bibliotech/command_generator/mysql'
 
