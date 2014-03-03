@@ -12,7 +12,7 @@ module BiblioTech
       end
 
       def for(config)
-        @adapter_registry[config[:adapter]].new(config)
+        @adapter_registry[config[:adapter]].new
       end
     end
 

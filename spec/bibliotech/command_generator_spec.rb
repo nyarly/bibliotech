@@ -26,7 +26,7 @@ module BiblioTech
             CommandGenerator.supported_adapters().should == [:type_1]
           end
           it "should return the correct adapter, instantiated with the config" do
-            CommandOne.should_receive(:new).with(config).and_return(return_adapter)
+            CommandOne.should_receive(:new).and_return(return_adapter)
             CommandGenerator.for(config).should == return_adapter
           end
         end
