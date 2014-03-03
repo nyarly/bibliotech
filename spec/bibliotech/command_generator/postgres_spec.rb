@@ -21,28 +21,29 @@ module BiblioTech
       let :command do generator.export(config, options) end
       subject do command end
 
-      describe 'with username and database' do
+      context 'with username and database' do
         let :config  do base_config end
         let :options do base_options end
 
         it { should == "pg_dump -Fc -U #{username} -d #{db_name}" }
 
-        describe 'and password' do
+        context 'and password' do
           let :config do base_config.merge({ :password => password }) end
 
           it { should == "PGPASSWORD=#{password} pg_dump -Fc -U #{username} -d #{db_name}" }
         end
 
-        describe 'and hostname' do
+        context 'and hostname' do
           let :config do base_config.merge({ :host => host }) end
 
           it { should == "pg_dump -Fc -h #{host} -U #{username} -d #{db_name}" }
         end
 
-        describe 'plus filename and path' do
+        context 'plus filename and path' do
           let :options do base_options.merge({ :filename => filename, :path => filepath}) end
 
           it { should == "pg_dump -Fc -U #{username} -d #{db_name} > #{filepath}/#{filename}" }
+
         end
       end
     end
