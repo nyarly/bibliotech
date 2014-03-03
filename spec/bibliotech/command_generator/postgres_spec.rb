@@ -44,6 +44,16 @@ module BiblioTech
 
           it { should == "pg_dump -Fc -U #{username} -d #{db_name} > #{filepath}/#{filename}" }
 
+          context 'and compressor' do
+            let :options do base_options.merge({
+              :filename => filename,
+              :path => filepath,
+              :compressor => :gzip
+            })
+            end
+
+            it { should == "pg_dump -Fc -U #{username} -d #{db_name} | gzip > #{filepath}/#{filename}.gz" }
+          end
         end
       end
     end
