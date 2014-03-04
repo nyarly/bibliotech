@@ -8,7 +8,7 @@ module BiblioTech
     let :password  do "password123"     end
     let :host      do "127.0.0.1"       end
     let :filename  do "export.pg"       end
-    let :filepath  do "/some/path"      end
+    let :path  do "/some/path"      end
 
     let :base_config do
       { :database => db_name,
@@ -40,28 +40,53 @@ module BiblioTech
         end
 
         context 'plus filename and path' do
-          let :options do base_options.merge({ :filename => filename, :path => filepath}) end
+          let :options do base_options.merge({ :filename => filename, :path => path}) end
 
-          it { should == "pg_dump -Fc -U #{username} -d #{db_name} > #{filepath}/#{filename}" }
+          it { should == "pg_dump -Fc -U #{username} -d #{db_name} > #{path}/#{filename}" }
 
           context 'and compressor' do
             let :options do base_options.merge({
               :filename => filename,
-              :path => filepath,
+              :path => path,
               :compressor => :gzip
             })
             end
 
-            it { should == "pg_dump -Fc -U #{username} -d #{db_name} | gzip > #{filepath}/#{filename}.gz" }
+            it { should == "pg_dump -Fc -U #{username} -d #{db_name} | gzip > #{path}/#{filename}.gz" }
           end
         end
 
         context 'with the whole shebang' do
-          let :options do base_options.merge({ :filename => filename, :path => filepath, :compresor => :gzip}) end
+          let :options do base_options.merge({ :filename => filename, :path => path, :compressor => :gzip}) end
           let :config  do base_config.merge({ :host => host, :password => password }) end
 
+          it { should == "PGPASSWORD=#{password} pg_dump -Fc -h #{host} -U #{username} -d #{db_name} | gzip > #{path}/#{filename}.gz" }
         end
       end
     end
+
+
+    describe :import do
+      let :command do generator.import(config, options) end
+      subject do command end
+
+      context 'with username, database, file, and path' do
+        let :config  do base_config end
+        let :options do
+          base_options.merge({ :filename => filename, :path => path })
+        end
+
+        it { should == "cat #{path}/#{filename} | pg_restore -U #{username} -d #{db_name}" }
+
+        context "plus password" do
+          let :config do base_config.merge({ :password => password }) end
+
+          it { should == "PGPASSWORD=#{password} cat #{path}/#{filename} | pg_restore -U #{username} -d #{db_name}" }
+        end
+      end
+    end
+
+
+
   end
 end
