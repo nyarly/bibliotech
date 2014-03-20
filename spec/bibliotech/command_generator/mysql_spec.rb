@@ -82,6 +82,17 @@ module BiblioTech
           let :config do base_config.merge({ :password => password }) end
 
           it { should == "cat #{path}/#{filename} | mysql -u #{username} --password='#{password}' #{db_name}" }
+
+          context 'and compressor' do
+            let :options do base_options.merge({
+              :filename => filename + '.gz',
+              :path => path,
+              :compressor => :gzip
+            })
+            end
+
+            it { should == "gunzip #{path}/#{filename}.gz | mysql -u #{username} --password='#{password}' #{db_name}" }
+          end
         end
       end
     end

@@ -77,6 +77,16 @@ module BiblioTech
         end
 
         it { should == "cat #{path}/#{filename} | pg_restore -U #{username} -d #{db_name}" }
+        context 'and compressor' do
+          let :options do base_options.merge({
+              :filename => filename + '.gz',
+              :path => path,
+              :compressor => :gzip
+          })
+          end
+
+          it { should == "gunzip #{path}/#{filename}.gz | pg_restore -U #{username} -d #{db_name}" }
+        end
 
         context "plus password" do
           let :config do base_config.merge({ :password => password }) end

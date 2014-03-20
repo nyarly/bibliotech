@@ -48,10 +48,12 @@ module BiblioTech
       return unless options[:filename] and options[:path]
 
       # TODO: modularize compressor lookup and support bunzip2 and 7zip
-      #parts << "| #{options[:compressor]}" if gzip?(options)
       file = File.join(options[:path], options[:filename])
-      #file << '.gz' if gzip?(options)
-      return "cat #{file} |"
+      if gzip?(options)
+        "gunzip #{file} |"
+      else
+        "cat #{file} |"
+      end
     end
 
     def gzip?(options)
