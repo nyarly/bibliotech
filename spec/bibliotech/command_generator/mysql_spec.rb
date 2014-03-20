@@ -66,7 +66,7 @@ module BiblioTech
     end
 
 
-    describe :import, :pending => true do
+    describe :import do
       let :command do generator.import(config, options) end
       subject do command end
 
@@ -76,12 +76,12 @@ module BiblioTech
           base_options.merge({ :filename => filename, :path => path })
         end
 
-        it { should == "cat #{path}/#{filename} | pg_restore -U #{username} -d #{db_name}" }
+        it { should == "cat #{path}/#{filename} | mysql -u #{username} #{db_name}" }
 
         context "plus password" do
           let :config do base_config.merge({ :password => password }) end
 
-          it { should == "PGPASSWORD=#{password} cat #{path}/#{filename} | pg_restore -U #{username} -d #{db_name}" }
+          it { should == "cat #{path}/#{filename} | mysql -u #{username} --password='#{password}' #{db_name}" }
         end
       end
     end

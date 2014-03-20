@@ -11,6 +11,15 @@ module BiblioTech
       parts.join(" ").strip
     end
 
+    def import(config, options = {})
+      parts = ['mysql']
+      parts.unshift input_from_file(options)
+      parts << "-h #{config[:host]}"                  if config[:host]
+      parts << "-u #{config[:username]}"
+      parts << "--password='#{config[:password]}'" if config[:password]
+      parts << "#{config[:database]}"
+      parts.join(" ").strip
+    end
 
   end
 end
