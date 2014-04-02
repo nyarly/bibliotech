@@ -30,7 +30,10 @@ module BiblioTech
         context 'and password' do
           let :config do base_config.merge({ :password => password }) end
 
-          it { should == "mysqldump -u #{username} --password='#{password}' #{db_name}" }
+          it { should include("mysqldump", "--password='#{password}'","-u #{username}", "#{db_name}") }
+          it { should =~ /^mysqldump/ }
+          it { should =~ /#{db_name}$/ }
+          #TODO: Refactor remaining specs into the above format
         end
 
         context 'and hostname' do
