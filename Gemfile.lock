@@ -25,6 +25,8 @@ GEM
     atomic (1.1.14)
     builder (3.1.4)
     chunky_png (1.2.9)
+    codeclimate-test-reporter (0.3.0)
+      simplecov (>= 0.7.1, < 1.0.0)
     compass (0.12.2)
       chunky_png (~> 1.2)
       fssm (>= 0.2.7)
@@ -87,4 +89,5 @@ PLATFORMS
 DEPENDENCIES
   activerecord
   bibliotech!
+  codeclimate-test-reporter
   corundum
