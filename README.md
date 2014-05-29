@@ -1,9 +1,12 @@
 BiblioTech
 ==========
 
-Database backup and transfer management gem for Rails applications. 
+Database backup and transfer management gem for Rails applications.
 
 BiblioTech is current in early development and not yet suitable for use.  Stay tuned.
+
+[![Code Climate](https://codeclimate.com/github/LRDesign/BiblioTech.png)](https://codeclimate.com/github/LRDesign/BiblioTech)
+[![Build Status](https://travis-ci.org/LRDesign/BiblioTech.svg?branch=master)](https://travis-ci.org/LRDesign/BiblioTech)
 
 Planned Features
 ----------------
