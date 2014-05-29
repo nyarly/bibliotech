@@ -54,37 +54,37 @@ module BiblioTech
     end
 
     describe "skeleton methods" do
-      let :generator do CommandGenerator.new end
+      let :generator do CommandGenerator.new(config) end
       let :config do { :some => :values } end
       let :filename do "filename" end
 
       it "should raise_error an error when calling export" do
         expect do
-          generator.export(config, filename)
+          generator.export(filename)
         end.to raise_error(NotImplementedError)
       end
 
       it "should raise_error an error when calling import" do
         expect do
-          generator.import(config, filename)
+          generator.import(filename)
         end.to raise_error(NotImplementedError)
       end
 
       it "should raise_error an error when calling wipe" do
         expect do
-          generator.wipe(config)
+          generator.wipe()
         end.to raise_error(NotImplementedError)
       end
 
       it "should raise_error an error when calling delete" do
         expect do
-          generator.delete(config)
+          generator.delete()
         end.to raise_error(NotImplementedError)
       end
 
       it "should raise_error an error when calling create" do
         expect do
-          generator.create(config)
+          generator.create()
         end.to raise_error(NotImplementedError)
       end
     end

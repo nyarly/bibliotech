@@ -1,5 +1,6 @@
 module BiblioTech
   class CommandGenerator
+    attr_accessor :config
 
     class << self
       def register(adapter_name, klass)
@@ -12,23 +13,27 @@ module BiblioTech
       end
 
       def for(config)
-        @adapter_registry[config[:adapter]].new
+        @adapter_registry[config[:adapter]].new(config)
       end
     end
 
-    def export(config, options = {})
+    def initialize(config)
+      @config = config
+    end
+
+    def export(options = {})
       raise NotImplementedError
     end
-    def import(config, options = {})
+    def import(options = {})
       raise NotImplementedError
     end
-    def wipe(config)
+    def wipe()
       raise NotImplementedError
     end
-    def delete(config)
+    def delete()
       raise NotImplementedError
     end
-    def create(config)
+    def create()
       raise NotImplementedError
     end
 

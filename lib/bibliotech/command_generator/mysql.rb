@@ -1,7 +1,7 @@
 module BiblioTech
   class CommandGenerator::MySql < CommandGenerator
 
-    def export(config, options = {})
+    def export(options = {})
       parts = ['mysqldump']
       parts << "-h #{config[:host]}"               if config[:host]
       parts << "-u #{config[:username]}"
@@ -11,7 +11,7 @@ module BiblioTech
       parts.join(" ").strip
     end
 
-    def import(config, options = {})
+    def import(options = {})
       parts = ['mysql']
       parts.unshift input_from_file(options)
       parts << "-h #{config[:host]}"                  if config[:host]

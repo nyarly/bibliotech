@@ -2,7 +2,7 @@ require 'spec_helper'
 
 module BiblioTech
   describe CommandGenerator::MySql do
-    let :generator do CommandGenerator::MySql.new end
+    let :generator do CommandGenerator::MySql.new(config) end
     let :db_name   do "db_name"         end
     let :username  do "user_name"       end
     let :password  do "password123"     end
@@ -18,7 +18,7 @@ module BiblioTech
     let :base_options do {} end
 
     describe :export do
-      let :command do generator.export(config, options) end
+      let :command do generator.export(options) end
       subject do command end
 
       context 'with username and database' do
@@ -70,7 +70,7 @@ module BiblioTech
 
 
     describe :import do
-      let :command do generator.import(config, options) end
+      let :command do generator.import(options) end
       subject do command end
 
       context 'with username, database, file, and path' do
