@@ -2,7 +2,7 @@ Gem::Specification.new do |spec|
   spec.name		= "bibliotech"
   #{MAJOR: incompatible}.{MINOR added feature}.{PATCH bugfix}-{LABEL}
   spec.version		= "0.0.1"
-  author_list = { "Evan Dorn" => 'evan@lrdesign.com' }
+  author_list = { "Evan Dorn" => 'evan@lrdesign.com', "Judson Lester" => 'judson@lrdesign.com' }
   spec.authors		= author_list.keys
   spec.email		= spec.authors.map {|name| author_list[name]}
   spec.summary		= ""
@@ -17,7 +17,18 @@ Gem::Specification.new do |spec|
   # Do this: y$@"
   # !!find lib bin doc spec spec_help -not -regex '.*\.sw.' -type f 2>/dev/null
   spec.files		= %w[
+    lib/bibliotech/command_generator/mysql.rb
+    lib/bibliotech/command_generator/postgres.rb
+    lib/bibliotech/command_generator.rb
+    lib/bibliotech/command_runner.rb
+    lib/bibliotech/compression/bzip2.rb
+    lib/bibliotech/compression/gzip.rb
+    lib/bibliotech/compression/sevenzip.rb
+    lib/bibliotech/compression.rb
+    lib/bibliotech/config.rb
+    lib/bibliotech.rb
   ]
+
 
   spec.test_file        = "spec_help/gem_test_suite.rb"
   spec.licenses = ["MIT"]
