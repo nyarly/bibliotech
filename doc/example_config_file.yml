@@ -1,0 +1,26 @@
+production:
+  backups:
+    dir: db_backups
+    compress:  gzip   # [ none, gzip, bzip2, 7zip ]
+    keep:
+      hourlies:   48
+      dailies:    14
+      weeklies:   8
+      monthlies:  all
+
+    create: hourly
+    prune:  daily
+    clone:
+      storage: s3  [ file, ftp, scp ]
+      target: ecliptic_db_backups   # URL
+
+staging:
+  backups: none
+  production: "/var/www/eclipticenterprises.com/current"
+
+development:
+  remotes:
+    production: "root@appserver2.lrdesign.com:/var/www/eclipticenterprises.com/current"
+    staging:    "root@appserver2.lrdesign.com:/var/www/staging.eclipticenterprises.com/current"
+
+

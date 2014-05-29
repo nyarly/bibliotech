@@ -1,6 +1,6 @@
 module BiblioTech
 end
 
-require 'bibliotech/config_loader'
+require 'bibliotech/config'
 require 'bibliotech/command_generator'
 

@@ -1,4 +1,5 @@
 require 'spec_helper'
+
 module BiblioTech
   class ::Hash
     def deep_merge(second)
@@ -7,7 +8,7 @@ module BiblioTech
     end
   end
 
-  describe ConfigLoader do
+  describe Config do
     describe 'initialization' do
       before do
         File.stub(:open).and_return(file)
@@ -36,24 +37,25 @@ module BiblioTech
           it "should load that file and parse with yaml" do
             File.should_receive(:open).with(path).and_return(file)
             YAML.should_receive(:load).with(file).and_return(hash)
-            ConfigLoader.new(path)
+            Config.load(path)
           end
 
           context "with default(development) environment" do
             it "should make the development hash available at config" do
-              loader = ConfigLoader.new(path)
-              loader.config.should == valid_hash[:development]
+              config = Config.load(path)
+              config.db_config.should == valid_hash[:development]
             end
           end
 
           context "with specified environment" do
             it "should make the symbol-specified hash available at config" do
-              loader = ConfigLoader.new(path, :production)
-              loader.config.should == valid_hash[:production]
+              config = Config.load(path, :production)
+              config.db_config.should == valid_hash[:production]
             end
+
             it "should make the string-specified hash available at config" do
-              loader = ConfigLoader.new(path, 'production')
-              loader.config.should == valid_hash[:production]
+              config = Config.load(path, 'production')
+              config.db_config.should == valid_hash[:production]
             end
           end
 
@@ -64,7 +66,7 @@ module BiblioTech
             let :hash do { :some => 'values'} end
             it "should raise an error" do
               expect do
-                ConfigLoader.new(path)
+                Config.load(path)
               end.to raise_error
             end
           end
@@ -73,7 +75,7 @@ module BiblioTech
             let :hash do  valid_hash.reject(){|k,v| k == :development } end
             it "should raise an error" do
               expect do
-                ConfigLoader.new(path)
+                Config.load(path)
               end.to raise_error
             end
           end
@@ -87,7 +89,7 @@ module BiblioTech
 
             it "should raise an error" do
               expect do
-                ConfigLoader.new(path)
+                Config.load(path)
               end.to raise_error
             end
           end
