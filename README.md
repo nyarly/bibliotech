@@ -3,6 +3,8 @@ BiblioTech
 
 Database backup and transfer management gem for Rails applications. 
 
+BiblioTech is current in early development and not yet suitable for use.  Stay tuned.
+
 Planned Features
 ----------------
 
@@ -20,4 +22,4 @@ Possible Features
 Credits
 -------
 
-Evan Dorn of Logical Reality Design, Inc.
+Evan Dorn and Judson Lester of Logical Reality Design, Inc.

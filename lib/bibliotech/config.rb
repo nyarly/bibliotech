@@ -14,7 +14,6 @@ module BiblioTech
     end
 
     def validate_db_config
-      p db_config
       raise "Environment #{environment} not found in config file." unless db_config.is_a?(Hash)
       raise "No adapter specified for #{environment}" unless db_config[:adapter]
     end
