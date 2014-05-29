@@ -9,7 +9,9 @@ module BiblioTech
     end
 
     def export(filepath)
-      Kernel.system(generator.export(filepath))
+      Kernel.system(
+        decorate_for_compression(generator, filepath).export(filepath)
+      )
     end
 
     def import(filepath)
@@ -21,6 +23,11 @@ module BiblioTech
       #filter_tables_for_wipeable(tables)
       #system(CommandGenerator.new.wipe_tables(@config,tables))
     #end
+
+    private
+    def decorate_for_compression(generator, filepath)
+      Compression.for(filepath, generator)
+    end
 
   end
 end
