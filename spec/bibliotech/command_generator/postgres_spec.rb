@@ -16,33 +16,44 @@ module BiblioTech
       }
     end
     let :base_options do {} end
+    #
+    # these two used in specs where command is a CommandChain containing two
+    # commands
+    let :first_cmd do command.commands.first end
+    let :second_cmd do command.commands[1] end
 
     describe :export do
       let :command do generator.export(options) end
+
       subject do command end
 
       context 'with username and database' do
-        let :config  do base_config end
+        let :config  do
+          base_config
+        end
         let :options do base_options end
 
-        it { should == "pg_dump -Fc -U #{username} -d #{db_name}" }
-
         context 'and password' do
-          let :config do base_config.merge({ :password => password }) end
+          let :config do
+            base_config.merge({ :password => password })
+          end
 
-          it { should == "PGPASSWORD=#{password} pg_dump -Fc -U #{username} -d #{db_name}" }
+          it { should be_a(Caliph::CommandLine) }
+          it { command.executable.should == 'pg_dump' }
+          it { command.options.should == ["-Fc", "-U #{username}", "#{db_name}"] }
+          it { command.env['PGPASSWORD'].should == password }
         end
 
         context 'and hostname' do
-          let :config do base_config.merge({ :host => host }) end
+          let :config do
+            base_config.merge({ :host => host })
+          end
 
-          it { should == "pg_dump -Fc -h #{host} -U #{username} -d #{db_name}" }
+          it { command.options.should == ["-Fc", "-h #{host}", "-U #{username}", "#{db_name}"] }
         end
 
         context 'plus filename and path' do
           let :options do base_options.merge({ :filename => filename, :path => path}) end
-
-          it { should == "pg_dump -Fc -U #{username} -d #{db_name} > #{path}/#{filename}" }
 
           context 'and compressor' do
             let :options do base_options.merge({
@@ -52,7 +63,16 @@ module BiblioTech
             })
             end
 
-            it { should == "pg_dump -Fc -U #{username} -d #{db_name} | gzip > #{path}/#{filename}.gz" }
+            it { command.should be_a(Caliph::PipelineChain) }
+            it { command.redirections.should ==   [ "1>#{path}/#{filename}.gz" ] }
+
+            context "first command" do
+              it { first_cmd.executable.should == 'pg_dump' }
+              it { first_cmd.options.should ==  ["-Fc", "-U #{username}", "#{db_name}"] }
+            end
+            context "second command" do
+              it { second_cmd.executable.should == 'gzip' }
+            end
           end
         end
 
@@ -60,7 +80,17 @@ module BiblioTech
           let :options do base_options.merge({ :filename => filename, :path => path, :compressor => :gzip}) end
           let :config  do base_config.merge({ :host => host, :password => password }) end
 
-          it { should == "PGPASSWORD=#{password} pg_dump -Fc -h #{host} -U #{username} -d #{db_name} | gzip > #{path}/#{filename}.gz" }
+          it { command.redirections.should == ["1>#{path}/#{filename}.gz"] }
+
+          context "first command" do
+            it { first_cmd.executable.should == "pg_dump" }
+            it { first_cmd.options.should == ["-Fc", "-h #{host}", "-U #{username}", "#{db_name}"] }
+            it { command.env['PGPASSWORD'].should == password }
+          end
+
+          context "second command" do
+            it { second_cmd.executable.should == 'gzip' }
+          end
         end
       end
     end
@@ -68,6 +98,7 @@ module BiblioTech
 
     describe :import do
       let :command do generator.import(options) end
+
       subject do command end
 
       context 'with username, database, file, and path' do
@@ -76,27 +107,32 @@ module BiblioTech
           base_options.merge({ :filename => filename, :path => path })
         end
 
-        it { should == "cat #{path}/#{filename} | pg_restore -U #{username} -d #{db_name}" }
-        context 'and compressor' do
-          let :options do base_options.merge({
-              :filename => filename + '.gz',
-              :path => path,
-              :compressor => :gzip
-          })
-          end
+        it { command.should be_a(Caliph::PipelineChain) }
 
-          it { should == "gunzip #{path}/#{filename}.gz | pg_restore -U #{username} -d #{db_name}" }
-        end
+        it { first_cmd.executable.should == 'cat' }
+        it { first_cmd.options.should == ["#{path}/#{filename}"] }
+        it { second_cmd.executable.should == 'pg_restore'}
+        it { second_cmd.options.should == ["-U #{username}", "-d #{db_name}" ] }
 
         context "plus password" do
           let :config do base_config.merge({ :password => password }) end
 
-          it { should == "PGPASSWORD=#{password} cat #{path}/#{filename} | pg_restore -U #{username} -d #{db_name}" }
+          it { second_cmd.options.should == ["-U #{username}", "-d #{db_name}"] }
+          it { command.env['PGPASSWORD'].should == password }
+
+          context 'and compressor' do
+            let :options do base_options.merge({
+              :filename => filename + '.gz',
+              :path => path,
+              :compressor => :gzip
+            })
+            end
+
+            it { first_cmd.executable.should == 'gunzip' }
+            it { first_cmd.options.should == ["#{path}/#{filename}.gz"] }
+          end
         end
       end
     end
-
-
-
   end
 end

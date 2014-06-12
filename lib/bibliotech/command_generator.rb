@@ -1,5 +1,9 @@
+require 'caliph'
+
 module BiblioTech
   class CommandGenerator
+    include Caliph::CommandLineDSL
+
     attr_accessor :config
 
     class << self
@@ -37,33 +41,37 @@ module BiblioTech
       raise NotImplementedError
     end
 
-    def output_to_file(options)
+    def output_to_file(command, options)
       return unless options[:filename] and options[:path]
-      parts = []
+
+      file = File.join(options[:path], options[:filename])
 
       # TODO: modularize compressor lookup and support bunzip2 and 7zip
-      parts << "| #{options[:compressor]}" if gzip?(options)
-      file = File.join(options[:path], options[:filename])
-      file << '.gz' if gzip?(options)
-      parts << "> " + file
-      parts.join(' ').strip
+      if compressed?(options)
+        file << '.gz'
+        command = command | cmd(options[:compressor])
+      end
+
+      command.redirect_stdout(file)
     end
 
-    def input_from_file(options)
+    def input_from_file(command, options)
       return unless options[:filename] and options[:path]
 
-      # TODO: modularize compressor lookup and support bunzip2 and 7zip
       file = File.join(options[:path], options[:filename])
-      if gzip?(options)
-        "gunzip #{file} |"
+
+      # TODO: modularize compressor lookup and support bunzip2 and 7zip
+      if compressed?(options)
+        cmd('gunzip', file) | command
       else
-        "cat #{file} |"
+        cmd('cat',file) | command
       end
     end
 
     def gzip?(options)
       options[:compressor] == :gzip
     end
+    alias compressed? gzip?  #TODO: expand this when other compressors are available
 
   end
 end
