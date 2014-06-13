@@ -2,7 +2,7 @@ source "https://rubygems.org"
 
 gem 'corundum'
 gem 'activerecord'
-gem 'caliph', :path => '../caliph'
+gem 'caliph'
 gem 'codeclimate-test-reporter', group: :test, require: nil
 gem 'pry'
 
