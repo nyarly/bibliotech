@@ -53,6 +53,7 @@ module BiblioTech
       end
 
       command.redirect_stdout(file)
+      command
     end
 
     def input_from_file(command, options)
@@ -62,10 +63,11 @@ module BiblioTech
 
       # TODO: modularize compressor lookup and support bunzip2 and 7zip
       if compressed?(options)
-        cmd('gunzip', file) | command
+        command = cmd('gunzip', file) | command
       else
-        cmd('cat',file) | command
+        command = cmd('cat',file) | command
       end
+      command
     end
 
     def gzip?(options)
@@ -78,4 +80,3 @@ end
 
 require 'bibliotech/command_generator/postgres'
 require 'bibliotech/command_generator/mysql'
-

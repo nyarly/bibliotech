@@ -41,7 +41,8 @@ Gem::Specification.new do |spec|
   spec.rdoc_options	+= %w{--main doc/README }
   spec.rdoc_options	+= ["--title", "#{spec.name}-#{spec.version} Documentation"]
 
-  #spec.add_dependency("", "> 0")
+  spec.add_dependency("caliph", "~> 0.3.1")
+
 
   #spec.post_install_message = "Thanks for installing my gem!"
 end

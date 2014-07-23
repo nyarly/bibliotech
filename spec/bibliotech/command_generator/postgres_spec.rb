@@ -2,20 +2,23 @@ require 'spec_helper'
 
 module BiblioTech
   describe CommandGenerator::Postgres do
-    let :generator do CommandGenerator::Postgres.new(config) end
-    let :db_name   do "db_name"         end
-    let :username  do "user_name"       end
-    let :password  do "password123"     end
-    let :host      do "127.0.0.1"       end
-    let :filename  do "export.pg"       end
-    let :path  do "/some/path"      end
+    let :generator do
+      CommandGenerator::Postgres.new(config)
+    end
+
+    let   (:db_name){    "db_name"       }
+    let   (:username){   "user_name"     }
+    let   (:password){   "password123"   }
+    let   (:host){       "127.0.0.1"     }
+    let   (:filename){   "export.pg"     }
+    let   (:path){       "/some/path"    }
+    let   (:base_options){{}}
 
     let :base_config do
       { :database => db_name,
         :username => username
       }
     end
-    let :base_options do {} end
     #
     # these two used in specs where command is a CommandChain containing two
     # commands
@@ -35,7 +38,7 @@ module BiblioTech
 
         context 'and password' do
           let :config do
-            base_config.merge({ :password => password })
+            base_config.merge(:password => password)
           end
 
           it { should be_a(Caliph::CommandLine) }
@@ -56,15 +59,16 @@ module BiblioTech
           let :options do base_options.merge({ :filename => filename, :path => path}) end
 
           context 'and compressor' do
-            let :options do base_options.merge({
-              :filename => filename,
-              :path => path,
-              :compressor => :gzip
-            })
+            let :options do
+              base_options.merge(
+                :filename => filename,
+                :path => path,
+                :compressor => :gzip
+              )
             end
 
             it { command.should be_a(Caliph::PipelineChain) }
-            it { command.redirections.should ==   [ "1>#{path}/#{filename}.gz" ] }
+            it { command.commands[1].redirections.should ==   [ "1>#{path}/#{filename}.gz" ] }
 
             context "first command" do
               it { first_cmd.executable.should == 'pg_dump' }
@@ -80,7 +84,7 @@ module BiblioTech
           let :options do base_options.merge({ :filename => filename, :path => path, :compressor => :gzip}) end
           let :config  do base_config.merge({ :host => host, :password => password }) end
 
-          it { command.redirections.should == ["1>#{path}/#{filename}.gz"] }
+          it { second_cmd.redirections.should == ["1>#{path}/#{filename}.gz"] }
 
           context "first command" do
             it { first_cmd.executable.should == "pg_dump" }

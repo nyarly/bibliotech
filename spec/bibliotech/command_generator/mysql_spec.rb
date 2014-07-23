@@ -66,7 +66,7 @@ module BiblioTech
             end
 
             it { command.should be_a(Caliph::PipelineChain) }
-            it { command.redirections.should ==   [ "1>#{path}/#{filename}.gz" ] }
+            it { second_cmd.redirections.should ==   [ "1>#{path}/#{filename}.gz" ] }
 
             context "first command" do
               it { first_cmd.executable.should == 'mysqldump' }
@@ -82,7 +82,7 @@ module BiblioTech
           let :options do base_options.merge({ :filename => filename, :path => path, :compressor => :gzip}) end
           let :config  do base_config.merge({ :host => host, :password => password }) end
 
-          it { command.redirections.should == ["1>#{path}/#{filename}.gz"] }
+          it { second_cmd.redirections.should == ["1>#{path}/#{filename}.gz"] }
 
           context "first command" do
             it { first_cmd.executable.should == "mysqldump" }
