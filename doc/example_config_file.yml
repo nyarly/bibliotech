@@ -1,26 +1,54 @@
-production:
-  backups:
-    dir: db_backups
-    compress:  gzip   # [ none, gzip, bzip2, 7zip ]
-    keep:
-      hourlies:   48
-      dailies:    14
-      weeklies:   8
-      monthlies:  all
+# bibliotech.yml on production server
+# used by commands like
+#   rake bibliotech:backups:create
+#   rake bibliotech:backups:cycle
+backups:
+  dir: db_backups
+  compress:  gzip   # [ none, gzip, bzip2, 7zip ]
+  keep:
+    hourlies:   48
+    dailies:    14
+    weeklies:   8
+    monthlies:  all
 
-    create: hourly
-    prune:  daily
-    clone:
-      storage: s3  [ file, ftp, scp ]
-      target: ecliptic_db_backups   # URL
+  create: hourly
+  prune:  daily
+  clone:
+    storage: s3  [ file, ftp, scp ]
+    target: ecliptic_db_backups   # URL
 
-staging:
-  backups: none
+database_config_file: 'config/database.yml'   # this is the default
+database_config:
+  hostname: xxxx
+  username: xxxxx
+  password: xxxxx
+  port: xxxx
+
+#bibliotech.yml on staging server
+#useful for:
+#  > rake bibliotech:restore_from[<remote name, e.g. production>]
+#   # (copies most recent database backup from this path or URL and restores it)
+backups: none
+database_config_file: 'config/database.yml'   # this is the default
+database_config:
+  hostname: xxxx
+  username: xxxxx
+  password: xxxxx
+  port: xxxx
+remotes:
   production: "/var/www/eclipticenterprises.com/current"
 
-development:
-  remotes:
-    production: "root@appserver2.lrdesign.com:/var/www/eclipticenterprises.com/current"
-    staging:    "root@appserver2.lrdesign.com:/var/www/staging.eclipticenterprises.com/current"
+
+
+
+#bibliotech.yml on dev
+# used by commands like
+#   > rake bibliotech:remote_sync:down[production]   # production is default if ommitted
+#   > rake bibliotech:remote_sync:up
+#   > cap bibliotech:remote_sync:down[production]  # uses Cap config, so URL below is unnecessary in config
+#
+remotes:
+  production: "root@appserver2.lrdesign.com:/var/www/eclipticenterprises.com/current"
+  staging:    "root@appserver2.lrdesign.com:/var/www/staging.eclipticenterprises.com/current"
 
 
