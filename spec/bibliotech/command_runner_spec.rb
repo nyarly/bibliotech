@@ -19,8 +19,14 @@ module BiblioTech
 
     let :command do "some cli command" end
 
+    let :shell do
+      double("Caliph::Shell")
+    end
+
     let :runner do
-      CommandRunner.new(config)
+      CommandRunner.new(config).tap do |runner|
+        runner.shell = shell
+      end
     end
 
     before do
@@ -30,13 +36,13 @@ module BiblioTech
     describe "single commands" do
       it 'should do export' do
         generator.should_receive(:export).and_return(command)
-        Kernel.should_receive(:system).with(command)
+        shell.should_receive(:run).with(command)
         runner.export('path/to/file')
       end
 
       it 'should do import' do
         generator.should_receive(:import).and_return(command)
-        Kernel.should_receive(:system).with(command)
+        shell.should_receive(:run).with(command)
         runner.import('path/to/file')
       end
     end

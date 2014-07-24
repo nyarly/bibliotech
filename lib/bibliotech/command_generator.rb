@@ -46,11 +46,8 @@ module BiblioTech
       def self.find_class(config)
         return NullAdapter unless config.has_key?(:filename) and config.has_key?(:path)
 
-        if config.has_key? :compressor
-          return adapter_registry.fetch(config[:compressor]) do
-            raise "config[:compressor] is #{config[:compressor].inspect} - supported compressors are #{supported_adapters.select{|ad| ad.is_a? Symbol}.join(", ")}"
-          end
-        end
+        explicit = find_explicit(config)
+        return explicit unless explicit.nil?
 
         filename = config[:filename]
         _, klass = adapter_registry.find{ |pattern, klass|
@@ -91,6 +88,14 @@ module BiblioTech
         IdentityFileInput
       end
 
+      def self.find_explicit(config)
+        if config.has_key? :expander
+          return adapter_registry.fetch(config[:expander]) do
+            raise "config[:expander] is #{config[:expander].inspect} - supported expanders are #{supported_adapters.select{|ad| ad.is_a? Symbol}.join(", ")}"
+          end
+        end
+      end
+
       def self.registry_host
         FileInput
       end
@@ -99,6 +104,14 @@ module BiblioTech
     class FileOutput < File
       def self.identity_adapter
         IdentityFileOutput
+      end
+
+      def self.find_explicit(config)
+        if config.has_key? :compressor
+          return adapter_registry.fetch(config[:compressor]) do
+            raise "config[:compressor] is #{config[:compressor].inspect} - supported compressors are #{supported_adapters.select{|ad| ad.is_a? Symbol}.join(", ")}"
+          end
+        end
       end
 
       def self.registry_host
@@ -116,10 +129,21 @@ module BiblioTech
     class GzipExpander < FileInput
       register(/.*\.gz\z/)
       register(/.*\.gzip\z/)
-      register :gzip
 
       def go(command)
         command = cmd("gunzip", file) | command
+      end
+    end
+
+    class ExplicitGzipExpander < GzipExpander
+      register :gzip
+
+      def file
+        file = super
+        unless PATTERNS.any?{|pattern| pattern =~ file}
+          return file + ".gz"
+        end
+        file
       end
     end
 

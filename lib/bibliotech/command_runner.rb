@@ -2,10 +2,12 @@ module BiblioTech
   class CommandRunner
 
     attr_reader :generator
+    attr_accessor :shell
 
     def initialize(config)
       @config = config
       @generator = CommandGenerator.for(config.db_config)
+      @shell = Caliph.new
     end
 
     def export(filepath)
@@ -22,7 +24,7 @@ module BiblioTech
       #system(CommandGenerator.new.wipe_tables(@config,tables))
     #end
     def run(command)
-      Kernel.system(command)
+      @shell.run(command)
     end
 
     private
@@ -32,4 +34,3 @@ module BiblioTech
 
   end
 end
-
