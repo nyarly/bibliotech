@@ -1,9 +1,9 @@
 require 'spec_helper'
 
 module BiblioTech
-  describe CommandGenerator::Postgres do
+  describe CommandGenerator do
     let :generator do
-      CommandGenerator::Postgres.new(config)
+      CommandGenerator.new(config)
     end
 
     let   (:db_name){    "db_name"       }
@@ -15,10 +15,13 @@ module BiblioTech
     let   (:base_options){{}}
 
     let :base_config do
-      { :database => db_name,
+      {
+        :adapter => :postgres,
+        :database => db_name,
         :username => username
       }
     end
+
     #
     # these two used in specs where command is a CommandChain containing two
     # commands
@@ -89,7 +92,7 @@ module BiblioTech
           context "first command" do
             it { first_cmd.executable.should == "pg_dump" }
             it { first_cmd.options.should == ["-Fc", "-h #{host}", "-U #{username}", "#{db_name}"] }
-            it { command.env['PGPASSWORD'].should == password }
+            it { first_cmd.env['PGPASSWORD'].should == password }
           end
 
           context "second command" do
@@ -111,17 +114,15 @@ module BiblioTech
           base_options.merge({ :filename => filename, :path => path })
         end
 
-        it { command.should be_a(Caliph::PipelineChain) }
 
-        it { first_cmd.executable.should == 'cat' }
-        it { first_cmd.options.should == ["#{path}/#{filename}"] }
-        it { second_cmd.executable.should == 'pg_restore'}
-        it { second_cmd.options.should == ["-U #{username}", "-d #{db_name}" ] }
+        it { command.redirections.should == ["0<#{path}/#{filename}"] }
+        it { command.executable.should == 'pg_restore'}
+        it { command.options.should == ["-U #{username}", "-d #{db_name}" ] }
 
         context "plus password" do
           let :config do base_config.merge({ :password => password }) end
 
-          it { second_cmd.options.should == ["-U #{username}", "-d #{db_name}"] }
+          it { command.options.should == ["-U #{username}", "-d #{db_name}"] }
           it { command.env['PGPASSWORD'].should == password }
 
           context 'and compressor' do
@@ -132,6 +133,7 @@ module BiblioTech
             })
             end
 
+            it { command.should be_a(Caliph::PipelineChain) }
             it { first_cmd.executable.should == 'gunzip' }
             it { first_cmd.options.should == ["#{path}/#{filename}.gz"] }
           end

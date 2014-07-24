@@ -3,7 +3,7 @@ require 'spec_helper'
 module BiblioTech
   describe CommandGenerator do
 
-    describe "class methods" do
+      describe "class methods", :pending => true do
       describe "adapter lookup" do
         class CommandOne < CommandGenerator; end;
         class CommandTwo < CommandGenerator; end;
@@ -58,18 +58,6 @@ module BiblioTech
       let :config do { :some => :values } end
       let :filename do "filename" end
 
-      it "should raise_error an error when calling export" do
-        expect do
-          generator.export(filename)
-        end.to raise_error(NotImplementedError)
-      end
-
-      it "should raise_error an error when calling import" do
-        expect do
-          generator.import(filename)
-        end.to raise_error(NotImplementedError)
-      end
-
       it "should raise_error an error when calling wipe" do
         expect do
           generator.wipe()
@@ -90,4 +78,3 @@ module BiblioTech
     end
   end
 end
-

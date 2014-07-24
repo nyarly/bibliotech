@@ -1,25 +1,29 @@
 module BiblioTech
-  class CommandGenerator::Postgres < CommandGenerator
+  module Postgres
+    class Export < Builders::Export
+      register :postgres
 
-    def export(options = {})
-      command = cmd('pg_dump', '-Fc')
-      command.options << "-h #{config[:host]}"      if config[:host]
-      command.options << "-U #{config[:username]}"
-      command.options << "#{config[:database]}"
-      command = output_to_file(command,options)     if options[:filename]
-      command.env["PGPASSWORD"] = config[:password] if config[:password]
-      command
+      def go(command)
+        command.from('pg_dump', '-Fc')
+        command.options << "-h #{config[:host]}"      if config[:host]
+        command.options << "-U #{config[:username]}"
+        command.options << "#{config[:database]}"
+        command.env["PGPASSWORD"] = config[:password] if config[:password]
+        command
+      end
     end
 
-    def import(options = {})
-      command = cmd('pg_restore')
-      command.options << "-h #{config[:host]}"      if config[:host]
-      command.options << "-U #{config[:username]}"
-      command.options << "-d #{config[:database]}"
-      command = input_from_file(command,options)    if options[:filename]
-      command.env["PGPASSWORD"] = config[:password] if config[:password]
-      command
-    end
+    class Import < Builders::Import
+      register :postgres
 
+      def go(command)
+        command.from('pg_restore')
+        command.options << "-h #{config[:host]}"      if config[:host]
+        command.options << "-U #{config[:username]}"
+        command.options << "-d #{config[:database]}"
+        command.env["PGPASSWORD"] = config[:password] if config[:password]
+        command
+      end
+    end
   end
 end

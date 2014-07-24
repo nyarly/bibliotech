@@ -1,25 +1,29 @@
 module BiblioTech
-  class CommandGenerator::MySql < CommandGenerator
+  module MySql
+    class Export < Builders::Export
+      register :mysql
 
-    def export(options = {})
-      command = cmd('mysqldump')
-      command.options << "-h #{config[:host]}"               if config[:host]
-      command.options << "-u #{config[:username]}"           if config[:username]
-      command.options << "--password='#{config[:password]}'" if config[:password]
-      command.options << "#{config[:database]}"
-      command = output_to_file(command, options)             if options[:filename]
-      command
+      def go(command)
+        command.from('mysqldump')
+        command.options << "-h #{config[:host]}"               if config[:host]
+        command.options << "-u #{config[:username]}"           if config[:username]
+        command.options << "--password='#{config[:password]}'" if config[:password]
+        command.options << "#{config[:database]}"
+        command
+      end
     end
 
-    def import(options = {})
-      command = cmd('mysql')
-      command.options << "-h #{config[:host]}"               if config[:host]
-      command.options << "-u #{config[:username]}"           if config[:username]
-      command.options << "--password='#{config[:password]}'" if config[:password]
-      command.options << "#{config[:database]}"
-      command = input_from_file(command, options)            if options[:filename]
-      command
-    end
+    class Import < Builders::Import
+      register :mysql
 
+      def go(command)
+        command.from('mysql')
+        command.options << "-h #{config[:host]}"               if config[:host]
+        command.options << "-u #{config[:username]}"           if config[:username]
+        command.options << "--password='#{config[:password]}'" if config[:password]
+        command.options << "#{config[:database]}"
+        command
+      end
+    end
   end
 end

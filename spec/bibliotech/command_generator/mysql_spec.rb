@@ -2,8 +2,10 @@ require 'spec_helper'
 require 'pry'
 
 module BiblioTech
-  describe CommandGenerator::MySql do
-    let :generator do CommandGenerator::MySql.new(config) end
+  describe CommandGenerator, "for mysql" do
+    let :generator do
+      CommandGenerator.new(config)
+    end
     let :db_name   do "db_name"         end
     let :username  do "user_name"       end
     let :password  do "password123"     end
@@ -12,7 +14,9 @@ module BiblioTech
     let :path  do "/some/path"      end
 
     let :base_config do
-      { :database => db_name,
+      {
+        :adapter => :mysql,
+        :database => db_name,
         :username => username
       }
     end
@@ -108,17 +112,16 @@ module BiblioTech
           base_options.merge({ :filename => filename, :path => path })
         end
 
-        it { command.should be_a(Caliph::PipelineChain) }
+        it { command.should be_a(Caliph::CommandLine) }
 
-        it { first_cmd.executable.should == 'cat' }
-        it { first_cmd.options.should == ["#{path}/#{filename}"] }
-        it { second_cmd.executable.should == 'mysql'}
-        it { second_cmd.options.should == ["-u #{username}", db_name ] }
+        it { command.redirections.should == ["0<#{path}/#{filename}"] }
+        it { command.executable.should == 'mysql'}
+        it { command.options.should == ["-u #{username}", db_name ] }
 
         context "plus password" do
           let :config do base_config.merge({ :password => password }) end
 
-          it { second_cmd.options.should == ["-u #{username}","--password='#{password}'", "#{db_name}"] }
+          it { command.options.should == ["-u #{username}","--password='#{password}'", "#{db_name}"] }
 
           context 'and compressor' do
             let :options do base_options.merge({
@@ -128,6 +131,7 @@ module BiblioTech
             })
             end
 
+            it { command.should be_a(Caliph::PipelineChain) }
             it { first_cmd.executable.should == 'gunzip' }
             it { first_cmd.options.should == ["#{path}/#{filename}.gz"] }
           end
