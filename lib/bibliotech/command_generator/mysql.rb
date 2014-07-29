@@ -5,10 +5,10 @@ module BiblioTech
 
       def go(command)
         command.from('mysqldump')
-        command.options << "-h #{config[:host]}"               if config[:host]
-        command.options << "-u #{config[:username]}"           if config[:username]
-        command.options << "--password='#{config[:password]}'" if config[:password]
-        command.options << "#{config[:database]}"
+        config.optional{ command.options << "-h #{config.host}" }
+        config.optional{ command.options << "-u #{config.username}" }
+        config.optional{ command.options << "--password='#{config.password}'" }
+        command.options << "#{config.database}"
         command
       end
     end
@@ -18,10 +18,10 @@ module BiblioTech
 
       def go(command)
         command.from('mysql')
-        command.options << "-h #{config[:host]}"               if config[:host]
-        command.options << "-u #{config[:username]}"           if config[:username]
-        command.options << "--password='#{config[:password]}'" if config[:password]
-        command.options << "#{config[:database]}"
+        config.optional{ command.options << "-h #{config.host}" }
+        config.optional{ command.options << "-u #{config.username}" }
+        config.optional{ command.options << "--password='#{config.password}'" }
+        command.options << "#{config.database}"
         command
       end
     end

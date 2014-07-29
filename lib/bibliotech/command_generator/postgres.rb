@@ -5,10 +5,11 @@ module BiblioTech
 
       def go(command)
         command.from('pg_dump', '-Fc')
-        command.options << "-h #{config[:host]}"      if config[:host]
-        command.options << "-U #{config[:username]}"
-        command.options << "#{config[:database]}"
-        command.env["PGPASSWORD"] = config[:password] if config[:password]
+        config.optional{ command.options << "-h #{config.host}" }
+        config.optional{ command.env["PGPASSWORD"] = config.password }
+
+        command.options << "-U #{config.username}"
+        command.options << "#{config.database}"
         command
       end
     end
@@ -18,10 +19,11 @@ module BiblioTech
 
       def go(command)
         command.from('pg_restore')
-        command.options << "-h #{config[:host]}"      if config[:host]
-        command.options << "-U #{config[:username]}"
-        command.options << "-d #{config[:database]}"
-        command.env["PGPASSWORD"] = config[:password] if config[:password]
+        config.optional{ command.options << "-h #{config.host}" }
+        config.optional{ command.env["PGPASSWORD"] = config.password }
+
+        command.options << "-U #{config.username}"
+        command.options << "-d #{config.database}"
         command
       end
     end

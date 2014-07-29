@@ -19,12 +19,6 @@ backups:
 
 database_config_env: production
 database_config_file: 'config/database.yml'   # this is the default
-# -- or --
-database_config:
-  hostname: xxxx
-  username: xxxxx
-  password: xxxxx
-  port: xxxx
 
 #bibliotech.yml on staging server
 #useful for:

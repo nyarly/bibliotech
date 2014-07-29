@@ -44,28 +44,29 @@ module BiblioTech
 
     class File < Base
       def self.find_class(config)
-        return NullAdapter unless config.has_key?(:filename) and config.has_key?(:path)
+        file = config.file
 
         explicit = find_explicit(config)
         return explicit unless explicit.nil?
 
-        filename = config[:filename]
         _, klass = adapter_registry.find{ |pattern, klass|
           next if pattern.is_a? Symbol
-          filename =~ pattern
+          file =~ pattern
         }
         klass || identity_adapter
+      rescue KeyError
+        return NullAdapter
       end
 
       def file
-        ::File.join(config[:path], config[:filename])
+        ::File.join(config.path, config.filename)
       end
     end
 
     class Database < Base
       def self.find_class(config)
-        adapter_registry.fetch(config[:adapter]) do
-          raise "config[:adapter] is #{config[:adapter].inspect} - supported adapters are #{supported_adapters.join(", ")}"
+        adapter_registry.fetch(config.adapter) do
+          raise "config.adapter is #{config.adapter.inspect} - supported adapters are #{supported_adapters.join(", ")}"
         end
       end
     end
@@ -89,11 +90,11 @@ module BiblioTech
       end
 
       def self.find_explicit(config)
-        if config.has_key? :expander
-          return adapter_registry.fetch(config[:expander]) do
-            raise "config[:expander] is #{config[:expander].inspect} - supported expanders are #{supported_adapters.select{|ad| ad.is_a? Symbol}.join(", ")}"
-          end
+        return adapter_registry.fetch(config.expander) do
+          raise "config.expander is #{config.expander.inspect} - supported expanders are #{supported_adapters.select{|ad| ad.is_a? Symbol}.join(", ")}"
         end
+      rescue KeyError
+        nil
       end
 
       def self.registry_host
@@ -107,11 +108,11 @@ module BiblioTech
       end
 
       def self.find_explicit(config)
-        if config.has_key? :compressor
-          return adapter_registry.fetch(config[:compressor]) do
-            raise "config[:compressor] is #{config[:compressor].inspect} - supported compressors are #{supported_adapters.select{|ad| ad.is_a? Symbol}.join(", ")}"
-          end
+        return adapter_registry.fetch(config.compressor) do
+          raise "config.compressor is #{config.compressor.inspect} - supported compressors are #{supported_adapters.select{|ad| ad.is_a? Symbol}.join(", ")}"
         end
+      rescue KeyError => ke
+        puts "\n#{__FILE__}:#{__LINE__} => #{ke.inspect}"
       end
 
       def self.registry_host
