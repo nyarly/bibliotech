@@ -57,7 +57,8 @@ module BiblioTech
     end
 
     #clean up the DB dumps
-    def cycle
+    def prune
+      Pruner.new(config.backups_dir, config.backups_name)
     end
 
     #return the latest dump of the DB

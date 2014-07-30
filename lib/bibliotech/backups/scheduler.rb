@@ -1,7 +1,13 @@
+require 'bibliotech/backups/file_record'
+
 module BiblioTech
   module Backups
     class Scheduler
       attr_accessor :frequency, :limit
+
+      def initialize(frequency, limit)
+        @frequency, @limit = frequency, limit
+      end
 
       def end_time(file_list)
         file_list.map{|record| record.timestamp}.max
@@ -36,19 +42,6 @@ module BiblioTech
           time -= freq_seconds
         end
         return file_list
-      end
-    end
-
-    class FileRecord
-      attr_accessor :path, :timestamp, :keep
-
-      def initialize(path, timestamp)
-        @path, @timestamp = path, timestamp
-        @keep = false
-      end
-
-      def keep?
-        !!@keep
       end
     end
   end

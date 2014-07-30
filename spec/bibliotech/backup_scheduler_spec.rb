@@ -23,9 +23,7 @@ module BiblioTech::Backups
 
     describe "without a limit" do
       let :scheduler do
-        Scheduler.new.tap do |scheduler|
-          scheduler.frequency = 60
-        end
+        Scheduler.new(60, nil)
       end
 
       context "when there's more than enough backups" do
@@ -41,10 +39,7 @@ module BiblioTech::Backups
 
     describe "with a limit" do
       let :scheduler do
-        Scheduler.new.tap do |scheduler|
-          scheduler.frequency = 60
-          scheduler.limit = 8
-        end
+        Scheduler.new(60, 8)
       end
 
       context "when there's just enough backups" do
