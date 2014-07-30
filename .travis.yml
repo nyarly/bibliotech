@@ -1,2 +1,8 @@
 language: ruby
-script: CODECLIMATE_REPO_TOKEN=29dae821c614b8d8b4482312bec81b43fb8747fe05f939a58cb874aeb0990784 bundle exec rake ci
+script: CODECLIMATE_REPO_TOKEN=29dae821c614b8d8b4482312bec81b43fb8747fe05f939a58cb874aeb0990784
+  bundle exec rake ci
+env:
+  global:
+  - AMAZON_S3_BUCKET=lrd-travis-caching
+  - secure: qUvnxAA9QutvpxJkFcAosyl+Wa7mbY1IylfN2vvMGk+H8l5GtSVAtgw1WABR4gR1YF2pUQI3YLgM3k/7JINo2Y0FBVTTueF6rP+/P9UKl5j2rlzuB2aNJENf2nepgtV2p24lS4QUjfNYTJ+WTVC405ca8m8FQze7jLNg1Hqpa/Y=
+  - secure: QSvy1VBAc0igg/DXPCetbTDDy+Z0LeIzyk7SxLb/s/eSUuDzO7GwvCN2SAqSUIY5WAQN5Gr/ABElLOlBTwtzNreZd6172EFEFDDnkUavWdtV2cXH1ejP+pBD6wglb/ygo6V8q7/gJlqdQOMk58YAnRWpak0jgtjj+f5WyqUWB4w=
