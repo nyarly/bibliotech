@@ -17,16 +17,34 @@ Gem::Specification.new do |spec|
   # Do this: y$@"
   # !!find lib bin doc spec spec_help -not -regex '.*\.sw.' -type f 2>/dev/null
   spec.files		= %w[
-    lib/bibliotech/command_generator/mysql.rb
     lib/bibliotech/command_generator/postgres.rb
-    lib/bibliotech/command_generator.rb
+    lib/bibliotech/command_generator/mysql.rb
+    lib/bibliotech/config.rb
     lib/bibliotech/command_runner.rb
+    lib/bibliotech/command_generator.rb
+    lib/bibliotech/rake_lib.rb
+    lib/bibliotech/compression.rb
     lib/bibliotech/compression/bzip2.rb
     lib/bibliotech/compression/gzip.rb
     lib/bibliotech/compression/sevenzip.rb
-    lib/bibliotech/compression.rb
-    lib/bibliotech/config.rb
+    lib/bibliotech/backups/scheduler.rb
+    lib/bibliotech/backups/pruner.rb
+    lib/bibliotech/backups/file_record.rb
+    lib/bibliotech/application.rb
     lib/bibliotech.rb
+    spec/spec_helper.rb
+    spec/bibliotech/config_spec.rb
+    spec/bibliotech/command_generator/postgres_spec.rb
+    spec/bibliotech/command_generator/mysql_spec.rb
+    spec/bibliotech/backup_pruner_spec.rb
+    spec/bibliotech/compression_spec.rb
+    spec/bibliotech/compression/bzip2_spec.rb
+    spec/bibliotech/compression/sevenzip_spec.rb
+    spec/bibliotech/compression/bunzip2_spec.rb
+    spec/bibliotech/compression/gzip_spec.rb
+    spec/bibliotech/backup_scheduler_spec.rb
+    spec/bibliotech/command_generator_spec.rb
+    spec/bibliotech/command_runner_spec.rb
   ]
 
 
