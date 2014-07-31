@@ -51,9 +51,9 @@ module BiblioTech
             end
           end
 
-          it { should be_a(Caliph::CommandLine) }
-          it { command.executable.should == 'mysqldump' }
-          it { command.options.should == ["-u #{username}", "--password='#{password}'", "#{db_name}"] }
+          it { is_expected.to be_a(Caliph::CommandLine) }
+          it { expect(command.executable).to eq('mysqldump') }
+          it { expect(command.options).to eq(["-u #{username}", "--password='#{password}'", "#{db_name}"]) }
         end
 
         context 'and hostname' do
@@ -63,7 +63,7 @@ module BiblioTech
             end
           end
 
-          it { command.options.should == ["-h #{host}", "-u #{username}", "#{db_name}"] }
+          it { expect(command.options).to eq(["-h #{host}", "-u #{username}", "#{db_name}"]) }
         end
 
         context 'plus filename and path' do
@@ -80,15 +80,15 @@ module BiblioTech
               }}
             end
 
-            it { command.should be_a(Caliph::PipelineChain) }
-            it { second_cmd.redirections.should ==   [ "1>#{path}/#{filename}.gz" ] }
+            it { expect(command).to be_a(Caliph::PipelineChain) }
+            it { expect(second_cmd.redirections).to eq([ "1>#{path}/#{filename}.gz" ]) }
 
             context "first command" do
-              it { first_cmd.executable.should == 'mysqldump' }
-              it { first_cmd.options.should ==  ["-u #{username}", "#{db_name}"] }
+              it { expect(first_cmd.executable).to eq('mysqldump') }
+              it { expect(first_cmd.options).to eq(["-u #{username}", "#{db_name}"]) }
             end
             context "second command" do
-              it { second_cmd.executable.should == 'gzip' }
+              it { expect(second_cmd.executable).to eq('gzip') }
             end
           end
         end
@@ -103,15 +103,15 @@ module BiblioTech
             end
           end
 
-          it { second_cmd.redirections.should == ["1>#{path}/#{filename}.gz"] }
+          it { expect(second_cmd.redirections).to eq(["1>#{path}/#{filename}.gz"]) }
 
           context "first command" do
-            it { first_cmd.executable.should == "mysqldump" }
-            it { first_cmd.options.should == ["-h #{host}", "-u #{username}", "--password='#{password}'", "#{db_name}"] }
+            it { expect(first_cmd.executable).to eq("mysqldump") }
+            it { expect(first_cmd.options).to eq(["-h #{host}", "-u #{username}", "--password='#{password}'", "#{db_name}"]) }
           end
 
           context "second command" do
-            it { second_cmd.executable.should == 'gzip' }
+            it { expect(second_cmd.executable).to eq('gzip') }
           end
         end
       end
@@ -132,11 +132,11 @@ module BiblioTech
           { :backups => { :filename => filename, :dir => path }}
         end
 
-        it { command.should be_a(Caliph::CommandLine) }
+        it { expect(command).to be_a(Caliph::CommandLine) }
 
-        it { command.redirections.should == ["0<#{path}/#{filename}"] }
-        it { command.executable.should == 'mysql'}
-        it { command.options.should == ["-u #{username}", db_name ] }
+        it { expect(command.redirections).to eq(["0<#{path}/#{filename}"]) }
+        it { expect(command.executable).to eq('mysql')}
+        it { expect(command.options).to eq(["-u #{username}", db_name ]) }
 
         context "plus password" do
           let :config_hash do
@@ -145,7 +145,7 @@ module BiblioTech
             end
           end
 
-          it { command.options.should == ["-u #{username}","--password='#{password}'", "#{db_name}"] }
+          it { expect(command.options).to eq(["-u #{username}","--password='#{password}'", "#{db_name}"]) }
 
           context 'and compressor' do
             let :options do
@@ -156,9 +156,9 @@ module BiblioTech
               } }
             end
 
-            it { command.should be_a(Caliph::PipelineChain) }
-            it { first_cmd.executable.should == 'gunzip' }
-            it { first_cmd.options.should == ["#{path}/#{filename}.gz"] }
+            it { expect(command).to be_a(Caliph::PipelineChain) }
+            it { expect(first_cmd.executable).to eq('gunzip') }
+            it { expect(first_cmd.options).to eq(["#{path}/#{filename}.gz"]) }
           end
         end
       end

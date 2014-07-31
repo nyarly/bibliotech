@@ -21,7 +21,7 @@ module BiblioTech::Backups
         pruner.build_record("testing-2014-07-30_03:14.sql.gz")
       end
 
-      it { should be_a(FileRecord) }
+      it { is_expected.to be_a(FileRecord) }
       it "should have a good time" do
         expect(record.timestamp).to eql Time.new(2014, 7, 30, 3, 14, 0, 0)
       end

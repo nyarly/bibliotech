@@ -30,19 +30,19 @@ module BiblioTech
     end
 
     before do
-      CommandGenerator.stub(:for).and_return(generator)
+      allow(CommandGenerator).to receive(:for).and_return(generator)
     end
 
     describe "single commands" do
       it 'should do export' do
-        generator.should_receive(:export).and_return(command)
-        shell.should_receive(:run).with(command)
+        expect(generator).to receive(:export).and_return(command)
+        expect(shell).to receive(:run).with(command)
         runner.export('path/to/file')
       end
 
       it 'should do import' do
-        generator.should_receive(:import).and_return(command)
-        shell.should_receive(:run).with(command)
+        expect(generator).to receive(:import).and_return(command)
+        expect(shell).to receive(:run).with(command)
         runner.import('path/to/file')
       end
     end

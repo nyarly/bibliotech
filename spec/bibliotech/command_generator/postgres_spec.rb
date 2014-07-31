@@ -65,10 +65,10 @@ module BiblioTech
             end
           end
 
-          it { should be_a(Caliph::CommandLine) }
-          it { command.executable.should == 'pg_dump' }
-          it { command.options.should == ["-Fc", "-U #{username}", "#{db_name}"] }
-          it { command.env['PGPASSWORD'].should == password }
+          it { is_expected.to be_a(Caliph::CommandLine) }
+          it { expect(command.executable).to eq('pg_dump') }
+          it { expect(command.options).to eq(["-Fc", "-U #{username}", "#{db_name}"]) }
+          it { expect(command.env['PGPASSWORD']).to eq(password) }
         end
 
         context 'and hostname' do
@@ -78,7 +78,7 @@ module BiblioTech
             end
           end
 
-          it { command.options.should == ["-Fc", "-h #{host}", "-U #{username}", "#{db_name}"] }
+          it { expect(command.options).to eq(["-Fc", "-h #{host}", "-U #{username}", "#{db_name}"]) }
         end
 
         context 'plus filename and path and compressor' do
@@ -90,15 +90,15 @@ module BiblioTech
             })
           end
 
-          it { command.should be_a(Caliph::PipelineChain) }
-          it { command.commands[1].redirections.should ==   [ "1>#{path}/#{filename}.gz" ] }
+          it { expect(command).to be_a(Caliph::PipelineChain) }
+          it { expect(command.commands[1].redirections).to eq([ "1>#{path}/#{filename}.gz" ]) }
 
           context "first command" do
-            it { first_cmd.executable.should == 'pg_dump' }
-            it { first_cmd.options.should ==  ["-Fc", "-U #{username}", "#{db_name}"] }
+            it { expect(first_cmd.executable).to eq('pg_dump') }
+            it { expect(first_cmd.options).to eq(["-Fc", "-U #{username}", "#{db_name}"]) }
           end
           context "second command" do
-            it { second_cmd.executable.should == 'gzip' }
+            it { expect(second_cmd.executable).to eq('gzip') }
           end
         end
 
@@ -116,16 +116,16 @@ module BiblioTech
             end
           end
 
-          it { second_cmd.redirections.should == ["1>#{path}/#{filename}.gz"] }
+          it { expect(second_cmd.redirections).to eq(["1>#{path}/#{filename}.gz"]) }
 
           context "first command" do
-            it { first_cmd.executable.should == "pg_dump" }
-            it { first_cmd.options.should == ["-Fc", "-h #{host}", "-U #{username}", "#{db_name}"] }
-            it { first_cmd.env['PGPASSWORD'].should == password }
+            it { expect(first_cmd.executable).to eq("pg_dump") }
+            it { expect(first_cmd.options).to eq(["-Fc", "-h #{host}", "-U #{username}", "#{db_name}"]) }
+            it { expect(first_cmd.env['PGPASSWORD']).to eq(password) }
           end
 
           context "second command" do
-            it { second_cmd.executable.should == 'gzip' }
+            it { expect(second_cmd.executable).to eq('gzip') }
           end
         end
       end
@@ -146,9 +146,9 @@ module BiblioTech
           base_options.merge(:backups => { :filename => filename, :dir => path })
         end
 
-        it { command.redirections.should == ["0<#{path}/#{filename}"] }
-        it { command.executable.should == 'pg_restore'}
-        it { command.options.should == ["-U #{username}", "-d #{db_name}" ] }
+        it { expect(command.redirections).to eq(["0<#{path}/#{filename}"]) }
+        it { expect(command.executable).to eq('pg_restore')}
+        it { expect(command.options).to eq(["-U #{username}", "-d #{db_name}" ]) }
 
         context "plus password" do
           let :config_hash do
@@ -157,8 +157,8 @@ module BiblioTech
             end
           end
 
-          it { command.options.should == ["-U #{username}", "-d #{db_name}"] }
-          it { command.env['PGPASSWORD'].should == password }
+          it { expect(command.options).to eq(["-U #{username}", "-d #{db_name}"]) }
+          it { expect(command.env['PGPASSWORD']).to eq(password) }
 
           context 'and compressor' do
             let :options do
@@ -169,9 +169,9 @@ module BiblioTech
               })
             end
 
-            it { command.should be_a(Caliph::PipelineChain) }
-            it { first_cmd.executable.should == 'gunzip' }
-            it { first_cmd.options.should == ["#{path}/#{filename}.gz"] }
+            it { expect(command).to be_a(Caliph::PipelineChain) }
+            it { expect(first_cmd.executable).to eq('gunzip') }
+            it { expect(first_cmd.options).to eq(["#{path}/#{filename}.gz"]) }
           end
         end
       end

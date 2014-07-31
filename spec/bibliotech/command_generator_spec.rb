@@ -23,11 +23,11 @@ module BiblioTech
             CommandGenerator.register(:type_1, CommandOne)
           end
           it "should list single supported adapter" do
-            CommandGenerator.supported_adapters().should == [:type_1]
+            expect(CommandGenerator.supported_adapters()).to eq([:type_1])
           end
           it "should return the correct adapter, instantiated with the config" do
-            CommandOne.should_receive(:new).and_return(return_adapter)
-            CommandGenerator.for(config).should == return_adapter
+            expect(CommandOne).to receive(:new).and_return(return_adapter)
+            expect(CommandGenerator.for(config)).to eq(return_adapter)
           end
         end
 
@@ -37,7 +37,7 @@ module BiblioTech
             CommandGenerator.register(:type_2, CommandTwo)
           end
           it "should return a single registered class" do
-            CommandGenerator.supported_adapters().should include(:type_1, :type_2)
+            expect(CommandGenerator.supported_adapters()).to include(:type_1, :type_2)
           end
         end
         context "with one class registered twice" do
@@ -46,7 +46,7 @@ module BiblioTech
             CommandGenerator.register(:type_1a, CommandOne)
           end
           it "should list single supported adapter" do
-            CommandGenerator.supported_adapters().should == [:type_1, :type_1a]
+            expect(CommandGenerator.supported_adapters()).to eq([:type_1, :type_1a])
           end
         end
 
