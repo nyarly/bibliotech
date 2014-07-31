@@ -58,7 +58,11 @@ module BiblioTech
 
     #clean up the DB dumps
     def prune
-      Pruner.new(config.backups_dir, config.backups_name)
+      pruner = Pruner.new(config.backups_dir, config.backups_name)
+      config.each_prune_schedule do |frequency, limit|
+        pruner.add_schedule(frequency, limit)
+      end
+      pruner.go
     end
 
     #return the latest dump of the DB

@@ -3,17 +3,19 @@ module BiblioTech
     class MissingConfig < KeyError; end
 
     CONFIG_STEPS = {
-      :filename             => [ "backups","filename" ],
-      :path                 => [ "backups",                 "dir" ],
-      :compressor           => [ "backups",                 "compress" ],
-      :database_config_file => [ "database_config_file" ],
-      :database_config_env  => [ "database_config_env" ],
-      :db_adapter           => [ "database_config",         "adapter" ],
-      :db_host              => [ "database_config",         "host" ],
-      :db_port              => [ "database_config",         "port" ],
-      :db_database          => [ "database_config",         "database" ],
-      :db_username          => [ "database_config",         "username" ],
-      :db_password          => [ "database_config",         "password" ],
+      :database_config_file =>  [ "database_config_file" ]             ,
+      :database_config_env  =>  [ "database_config_env"  ]             ,
+      :filename             =>  [ "backups"              , "filename"  ]  ,
+      :path                 =>  [ "backups"              , "dir"       ]  ,
+      :compressor           =>  [ "backups"              , "compress"  ]  ,
+      :prune_schedule       =>  [ "backups"              , "keep"      ]  ,
+      :backup_frequency     =>  [ "backups"              , "frequency" ]  ,
+      :db_adapter           =>  [ "database_config"      , "adapter"   ]  ,
+      :db_host              =>  [ "database_config"      , "host"      ]  ,
+      :db_port              =>  [ "database_config"      , "port"      ]  ,
+      :db_database          =>  [ "database_config"      , "database"  ]  ,
+      :db_username          =>  [ "database_config"      , "username"  ]  ,
+      :db_password          =>  [ "database_config"      , "password"  ]  ,
     }
 
     def initialize(valise)
@@ -27,7 +29,7 @@ module BiblioTech
       @hash ||= stringify_keys(valise.contents("config.yaml"))
     end
 
-    def stringify_keys(hash)
+    def stringify_keys(hash) # sym -> string
       hash.keys.each do |key|
         if key.is_a?(Symbol)
           hash[key.to_s] = hash.delete(key)
@@ -86,6 +88,40 @@ module BiblioTech
     def remote_get(remote_name, key)
       steps = [remote_name] + steps_for(key)
       extract(steps, ["remotes"] + steps)
+    end
+
+    SCHEDULE_SHORTHANDS = {
+      "hourly"      => 60,
+      "hourlies"    => 60,
+      "daily"       => 60 * 24,
+      "dailies"     => 60 * 24,
+      "weekly"      => 60 * 24 * 7,
+      "weeklies"    => 60 * 24 * 7,
+      "monthly"     => 60 * 24 * 30,
+      "monthlies"   => 60 * 24 * 30,
+      "quarterly"   => 60 * 24 * 120,
+      "quarterlies" => 60 * 24 * 120,
+      "yearly"      => 60 * 24 * 365,
+      "yearlies"    => 60 * 24 * 365,
+    }
+    def regularize_frequency(frequency)
+      Integer( SCHEDULE_SHORTHANDS.fetch(frequency){ frequency } )
+    rescue ArgumentError
+      raise "#{frequency.inspect} is neither a number of minutes or a shorthand. Try:\n  #{SCHEDULE_SHORTHANDS.keys.join(" ")}"
+    end
+
+    def backup_frequency
+      @backup_frequency ||= regularize_frequency(local_get(:backup_frequency))
+    end
+
+    def each_prune_schedule
+      local_get(:prune_schedule).each do |frequency, limit|
+        real_frequency = regularize_frequency(frequency)
+        unless real_frequency % backup_frequency == 0
+          raise "Pruning frequency #{real_frequency}:#{frequency} is not a multiple of backup frequency: #{backup_frequency}:#{local_get(:backup_frequency)}"
+        end
+        yield(real_frequency, limit)
+      end
     end
 
     def database_config
