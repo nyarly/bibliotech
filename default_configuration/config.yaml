@@ -36,6 +36,7 @@ database_config:
 
 remotes:
   production:
+    user: root
     host: some.server.com
     path: "/var/www/eclipticenterprises.com/current"
     compressed: gzip
@@ -43,7 +44,7 @@ remotes:
 
 #bibliotech.yml on dev
 # used by commands like
-#   > rake bibliotech:remote_sync:down[production]   # production is default if ommitted
+#   > rake bibliotech:remote_sync:down[production]   # production is default if omitted
 #   > rake bibliotech:remote_sync:up
 #   > cap bibliotech:remote_sync:down[production]  # uses Cap config, so URL below is unnecessary in config
 #

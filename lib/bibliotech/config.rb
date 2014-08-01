@@ -5,10 +5,12 @@ module BiblioTech
     CONFIG_STEPS = {
       :database_config_file =>  [ "database_config_file" ]             ,
       :database_config_env  =>  [ "database_config_env"  ]             ,
+      :file                 =>  [ "backups"              , "file"      ]  ,
       :filename             =>  [ "backups"              , "filename"  ]  ,
       :path                 =>  [ "backups"              , "dir"       ]  ,
       :compressor           =>  [ "backups"              , "compress"  ]  ,
       :prune_schedule       =>  [ "backups"              , "keep"      ]  ,
+      :backup_name          =>  [ "backups"              , "prefix"    ]  ,
       :backup_frequency     =>  [ "backups"              , "frequency" ]  ,
       :db_adapter           =>  [ "database_config"      , "adapter"   ]  ,
       :db_host              =>  [ "database_config"      , "host"      ]  ,
@@ -90,6 +92,27 @@ module BiblioTech
       extract(steps, ["remotes"] + steps)
     end
 
+    def local_path
+      local_get(:fetch_dir)
+    rescue MissingConfig
+      local_get(:path)
+    end
+
+    def local_file(filename)
+      File::join(local_path, filename)
+    end
+
+    def remote_path(remote)
+      path = "#{remote_get(remote, :host)}:#{remote_get(remote, :path)}"
+      "#{remote_get(remote, :user)}@#{path}"
+    rescue MissingConfig
+      path
+    end
+
+    def remote_file(remote, filename)
+      File::join(remote_path(remote), filename)
+    end
+
     SCHEDULE_SHORTHANDS = {
       "hourly"      => 60,
       "hourlies"    => 60,
@@ -108,6 +131,10 @@ module BiblioTech
       Integer( SCHEDULE_SHORTHANDS.fetch(frequency){ frequency } )
     rescue ArgumentError
       raise "#{frequency.inspect} is neither a number of minutes or a shorthand. Try:\n  #{SCHEDULE_SHORTHANDS.keys.join(" ")}"
+    end
+
+    def backup_name
+      local_get(:backup_name)
     end
 
     def backup_frequency
@@ -130,6 +157,8 @@ module BiblioTech
 
     #@group File management
     def file
+      local_get(:file)
+    rescue MissingConfig
       ::File.join(path, filename)
     end
 

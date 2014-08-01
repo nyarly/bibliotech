@@ -36,6 +36,14 @@ module BiblioTech
       @memos[:command] ||= CommandGenerator.new(config)
     end
 
+    def pruner(options)
+      Pruner.new(config.merge(options))
+    end
+
+    def prune_list(options)
+      pruner(options).list
+    end
+
     def reset
       @memos.clear
     end
@@ -48,25 +56,36 @@ module BiblioTech
       @shell.run(commands.export(options))
     end
 
+    def create_backup(options)
+      time = Time.now.utc
+      return unless pruner(options).backup_needed?(time)
+      options["backups"] ||= options[:backups] || {}
+      options["backups"]["filename"] = prune_list(options).filename_for(time)
+      export(options)
+    end
+
     #pull a dump from a remote
-    def get
+    def get(options)
+      @shell.run(commands.fetch(options))
     end
 
     #push a dump to a remote
-    def send
+    def send(options)
+      @shell.run(commands.push(options))
     end
 
     #clean up the DB dumps
-    def prune
-      pruner = Pruner.new(config.backups_dir, config.backups_name)
-      config.each_prune_schedule do |frequency, limit|
-        pruner.add_schedule(frequency, limit)
-      end
-      pruner.go
+    def prune(options=nil)
+      pruner(option || {}).go
     end
 
     #return the latest dump of the DB
-    def latest
+    def latest(options)
+      pruner_list(options).most_recent.path
+    end
+
+    def remote_cli(remote, command)
+
     end
   end
 

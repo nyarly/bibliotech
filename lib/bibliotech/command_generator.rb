@@ -190,18 +190,34 @@ module BiblioTech
       @config = config
     end
 
-    def export(options = {})
-      options = config.merge(options)
+    def export(options = nil)
+      options = config.merge(options || {})
       command = cmd
       command = Builders::Export.for(options).go(command)
       Builders::FileOutput.for(options).go(command)
     end
 
-    def import(options = {})
-      options = config.merge(options)
+    def import(options = nil)
+      options = config.merge(options || {})
       command = cmd()
       command = Builders::Import.for(options).go(command)
       Builders::FileInput.for(options).go(command)
+    end
+
+    def fetch(remote, filename, options = nil)
+      options = config.merge(options || {})
+      cmd("scp") do |cmd|
+        cmd.options << remote_file(remote, filename)
+        cmd.options << local_file(filename)
+      end
+    end
+
+    def push(remote, filename, options = nil)
+      options = config.merge(options || {})
+      cmd("scp") do |cmd|
+        cmd.options << config.local_file(filename)
+        cmd.options << config.remote_file(remote, filename)
+      end
     end
 
     def wipe()

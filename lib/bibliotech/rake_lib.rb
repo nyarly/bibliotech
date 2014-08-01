@@ -5,6 +5,8 @@ module BiblioTech
   class Tasklib < ::Mattock::Tasklib
     setting(:app)
     setting(:config_path)
+    setting(:local)
+    setting(:remote)
 
     def default_configuration
       super
@@ -35,21 +37,40 @@ module BiblioTech
     def define
       in_namespace do
         namespace :backups do
-          task :create do
-            app.export
+          task :restore, [:name] do |task, args|
+            fail ":name is required" if args[:name].nil?
+            options = { :backups => { :filename => args[:name] } }
+            if %r[/] =~ args[:name]
+              options = { :backups => { :file => args[:name] } }
+            end
+            app.import(options)
           end
 
-          task :restore do
-            app.import
+          task :create, [:prefix] do |task, args|
+            fail ":prefix is required" if args[:prefix].nil?
+            app.create_backup( :backups => { :prefix => args[:prefix] } )
           end
 
-          task :clean do
+          task :clean, [:prefix] do |task, args|
+            fail ":prefix is required" if args[:prefix].nil?
+            app.prune( :backups => { :prefix => args[:prefix] } )
           end
 
-          task :perform => [:create, :clean]
+          task :perform, [:prefix] => [:create, :clean]
         end
 
         namespace :remote_sync do
+          task :down do
+            filename = app.remote_latest(remote)
+            app.get(remote, filename)
+            app.import(filename)
+          end
+
+          task :up do
+            filename = app.latest
+            app.send(remote, filename)
+            app.remote_import(remote, filename)
+          end
 
         end
       end
