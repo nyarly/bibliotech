@@ -29,6 +29,7 @@ Gem::Specification.new do |spec|
     lib/bibliotech/compression/sevenzip.rb
     lib/bibliotech/backups/scheduler.rb
     lib/bibliotech/backups/pruner.rb
+    lib/bibliotech/backups/prune_list.rb
     lib/bibliotech/backups/file_record.rb
     lib/bibliotech/application.rb
     lib/bibliotech.rb
