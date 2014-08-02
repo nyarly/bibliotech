@@ -84,8 +84,8 @@ module BiblioTech
       pruner_list(options).most_recent.path
     end
 
-    def remote_cli(remote, command)
-
+    def remote_cli(remote, command, options)
+      @shell.run(commands.ssh_cli(remote, command, options))
     end
   end
 

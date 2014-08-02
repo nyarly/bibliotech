@@ -61,17 +61,16 @@ module BiblioTech
 
         namespace :remote_sync do
           task :down do
-            filename = app.remote_latest(remote)
+            filename = app.remote_cli(remote, "latest")
             app.get(remote, filename)
-            app.import(filename)
+            app.import(:backups => { :filename => filename})
           end
 
           task :up do
             filename = app.latest
             app.send(remote, filename)
-            app.remote_import(remote, filename)
+            app.remote_cli(remote, "load", filename)
           end
-
         end
       end
     end

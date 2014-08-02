@@ -207,17 +207,44 @@ module BiblioTech
     def fetch(remote, filename, options = nil)
       options = config.merge(options || {})
       cmd("scp") do |cmd|
-        cmd.options << remote_file(remote, filename)
-        cmd.options << local_file(filename)
+        cmd.options << options.remote_file(remote, filename)
+        cmd.options << options.local_file(filename)
       end
     end
 
     def push(remote, filename, options = nil)
       options = config.merge(options || {})
       cmd("scp") do |cmd|
-        cmd.options << config.local_file(filename)
-        cmd.options << config.remote_file(remote, filename)
+        cmd.options << options.local_file(filename)
+        cmd.options << options.remote_file(remote, filename)
       end
+    end
+
+    def remote_cli(remote, *command_options)
+      options = {}
+      if command_options.last.is_a? Hash
+        options = command_options.pop
+      end
+      options = config.merge(options)
+      command_on_remote = cmd("cd") do |cmd|
+        cmd.options << options.remote_path(remote)
+      end & cmd("bundle", "exec", "bibliotech", *command_options)
+      cmd("ssh") do |cmd|
+        options.optionally{ cmd.options << "-i #{options.id_file(remote)}" }
+        options.optionally{ cmd.options << "-l #{options.remote_user(remote)}" }
+
+        cmd.options << options.address(remote)
+
+        options.optionally{ cmd.options << "-p #{options.remote_port(remote)}" } #ok
+
+        cmd.options << "-n" #because we're not going to be doing any input
+
+        options.optionally do
+          options.ssh_options(remote).each do |opt|
+            cmd.options << "-o #{opt}"
+          end
+        end
+      end - escaped_command(command_on_remote)
     end
 
     def wipe()
