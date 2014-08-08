@@ -19,12 +19,7 @@ module BiblioTech
             files << file_record
           end
         end
-      end
-
-      def most_recent
-        list.max_by do |record|
-          record.timestamp
-        end
+        files
       end
 
       def prefix_timestamp_re
@@ -35,7 +30,7 @@ module BiblioTech
         /\A#{prefix}-#{also}\..*\z/
       end
 
-      def filename_for(time)
+      def self.filename_for(prefix, time)
         time.strftime("#{prefix}-%Y-%m-%d_%H:%M.sql")
       end
 
@@ -43,7 +38,7 @@ module BiblioTech
         if file =~ prefix_re(/.*/)
           if !(match = prefix_timestamp_re.match(file)).nil?
             timespec = %w{year month day hour minute}.map do |part|
-              Integer(match[part])
+              Integer(match[part], 10)
             end
             parsed_time = Time::utc(*timespec)
             return FileRecord.new(File::join(path, file), parsed_time)

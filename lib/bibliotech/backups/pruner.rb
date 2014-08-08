@@ -1,5 +1,7 @@
 require 'bibliotech/backups/prune_list'
 require 'bibliotech/backups/file_record'
+require 'bibliotech/backups/scheduler'
+
 module BiblioTech
   module Backups
     class Pruner
@@ -13,7 +15,7 @@ module BiblioTech
       end
 
       def name
-        @path ||= config.backup_name
+        @name ||= config.backup_name
       end
 
       def schedules
@@ -26,7 +28,7 @@ module BiblioTech
       end
 
       def backup_needed?(time)
-        time - list.most_recent.timestamp < config.backup_frequency * 60
+        time - most_recent.timestamp < config.backup_frequency * 60
       end
 
       def list
@@ -38,6 +40,16 @@ module BiblioTech
             end
             list
           end
+      end
+
+      def most_recent
+        list.max_by do |record|
+          record.timestamp
+        end
+      end
+
+      def filename_for(time)
+        PruneList.filename_for(time)
       end
 
       def pruneable

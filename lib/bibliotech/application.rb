@@ -59,9 +59,10 @@ module BiblioTech
 
     def create_backup(options)
       time = Time.now.utc
-      return unless pruner(options).backup_needed?(time)
+      pruner = pruner(options)
+      return unless pruner.backup_needed?(time)
       options["backups"] ||= options[:backups] || {}
-      options["backups"]["filename"] = prune_list(options).filename_for(time)
+      options["backups"]["filename"] = pruner.filename_for(time)
       export(options)
     end
 
@@ -82,7 +83,7 @@ module BiblioTech
 
     #return the latest dump of the DB
     def latest(options = nil)
-      prune_list(options || {}).most_recent.path
+      pruner(options || {}).most_recent.path
     end
 
     def remote_cli(remote, command, options)

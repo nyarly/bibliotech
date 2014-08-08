@@ -7,6 +7,7 @@ module BiblioTech
 
       def initialize(frequency, limit)
         @frequency, @limit = frequency, limit
+        @limit = nil if limit == "all"
       end
 
       def end_time(file_list)

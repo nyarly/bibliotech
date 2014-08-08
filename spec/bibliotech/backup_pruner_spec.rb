@@ -1,13 +1,21 @@
 require 'bibliotech/application'
 require 'bibliotech/backups/pruner'
+require 'file-sandbox'
 module BiblioTech
   describe Backups::Pruner do
+    include FileSandbox
+
+    before :each do
+      sandbox.new :directory => "db_backups"
+      sandbox.new :file => "db_backups/backup-2014-08-12_00:00.sql.7z"
+    end
+
     let :app do
       App.new
     end
 
     it "should something latest" do
-      expect(app.latest("local" => "production")).to eql :a_helicopter
+      expect(app.latest("local" => "production")).to eql "db_backups/backup-2014-08-12_00:00.sql.7z"
     end
 
   end
@@ -31,7 +39,7 @@ module BiblioTech
     describe "creating filenames" do
       it "should match filenames it creates" do
         time = Time.new(2014, 7, 30, 3, 14, 37, 0)
-        record = pruner.build_record(pruner.filename_for(time))
+        record = pruner.build_record(Backups::PruneList.filename_for("testing", time))
         expect(record.timestamp).to be_within(60).of(time)
       end
     end

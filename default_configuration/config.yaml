@@ -8,14 +8,14 @@ production:
   backups:
     dir: db_backups
     compress:  gzip   # [ none, gzip, bzip2, 7zip ]
+    prefix: backup
     keep:
       hourlies:   48
       dailies:    14
       weeklies:   8
       monthlies:  all
 
-    create: hourly
-    prune:  daily
+    frequency: hourly
     clone:
       storage: s3  [ file, ftp, scp ]
       target: db_backups   # URL
