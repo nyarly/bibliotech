@@ -6,13 +6,14 @@ module BiblioTech
       def initialize(config)
         @config = config
       end
+      attr_reader :config
 
       def path
-        @path ||= config.backups_dir
+        @path ||= config.backup_path
       end
 
       def name
-        @path ||= config.backups_name
+        @path ||= config.backup_name
       end
 
       def schedules

@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+require 'bibliotech/cli'
+
+BiblioTech::CLI.start(ARGV)

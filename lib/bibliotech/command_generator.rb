@@ -44,7 +44,7 @@ module BiblioTech
 
     class File < Base
       def self.find_class(config)
-        file = config.file
+        file = config.backup_file
 
         explicit = find_explicit(config)
         return explicit unless explicit.nil?
@@ -54,12 +54,12 @@ module BiblioTech
           file =~ pattern
         }
         klass || identity_adapter
-      rescue KeyError
+      rescue Config::MissingConfig
         return NullAdapter
       end
 
       def file
-        ::File.join(config.path, config.filename)
+        config.backup_file
       end
     end
 
@@ -93,7 +93,7 @@ module BiblioTech
         return adapter_registry.fetch(config.expander) do
           raise "config.expander is #{config.expander.inspect} - supported expanders are #{supported_adapters.select{|ad| ad.is_a? Symbol}.join(", ")}"
         end
-      rescue KeyError
+      rescue Config::MissingConfig
         nil
       end
 
@@ -111,8 +111,7 @@ module BiblioTech
         return adapter_registry.fetch(config.compressor) do
           raise "config.compressor is #{config.compressor.inspect} - supported compressors are #{supported_adapters.select{|ad| ad.is_a? Symbol}.join(", ")}"
         end
-      rescue KeyError => ke
-        puts "\n#{__FILE__}:#{__LINE__} => #{ke.inspect}"
+      rescue KeyError
       end
 
       def self.registry_host
@@ -207,6 +206,7 @@ module BiblioTech
     def fetch(remote, filename, options = nil)
       options = config.merge(options || {})
       cmd("scp") do |cmd|
+        options.optionally{ cmd.options << "-i #{options.id_file(remote)}" }
         cmd.options << options.remote_file(remote, filename)
         cmd.options << options.local_file(filename)
       end
@@ -227,17 +227,17 @@ module BiblioTech
       end
       options = config.merge(options)
       command_on_remote = cmd("cd") do |cmd|
-        cmd.options << options.remote_path(remote)
+        cmd.options << options.root_dir_on(remote)
       end & cmd("bundle", "exec", "bibliotech", *command_options)
       cmd("ssh") do |cmd|
+        cmd.options << "-n" #because we're not going to be doing any input
         options.optionally{ cmd.options << "-i #{options.id_file(remote)}" }
         options.optionally{ cmd.options << "-l #{options.remote_user(remote)}" }
 
-        cmd.options << options.address(remote)
+        cmd.options << options.remote_host(remote)
 
         options.optionally{ cmd.options << "-p #{options.remote_port(remote)}" } #ok
 
-        cmd.options << "-n" #because we're not going to be doing any input
 
         options.optionally do
           options.ssh_options(remote).each do |opt|

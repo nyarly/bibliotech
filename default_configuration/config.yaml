@@ -1,53 +1,44 @@
-# bibliotech.yml on production server
-# used by commands like
-#   rake bibliotech:backups:create
-#   rake bibliotech:backups:cycle
-backups:
-  dir: db_backups
-  compress:  gzip   # [ none, gzip, bzip2, 7zip ]
-  keep:
-    hourlies:   48
-    dailies:    14
-    weeklies:   8
-    monthlies:  all
+local: development
+remote: staging
 
-  create: hourly
-  prune:  daily
-  clone:
-    storage: s3  [ file, ftp, scp ]
-    target: ecliptic_db_backups   # URL
-
-database_config_env: production
+#defaults
 database_config_file: 'config/database.yml'   # this is the default
 
-#bibliotech.yml on staging server
-#useful for:
-#  > rake bibliotech:restore_from[<remote name, e.g. production>]
-#   # (copies most recent database backup from this path or URL and restores it)
-backups: none
-database_config_env: staging
-database_config_file: 'config/database.yml'   # this is the default
-# -- or --
-database_config:
-  hostname: xxxx
-  username: xxxxx
-  password: xxxxx
-  port: xxxx
+production:
+  backups:
+    dir: db_backups
+    compress:  gzip   # [ none, gzip, bzip2, 7zip ]
+    keep:
+      hourlies:   48
+      dailies:    14
+      weeklies:   8
+      monthlies:  all
 
-remotes:
-  production:
-    user: root
-    host: some.server.com
-    path: "/var/www/eclipticenterprises.com/current"
-    compressed: gzip
+    create: hourly
+    prune:  daily
+    clone:
+      storage: s3  [ file, ftp, scp ]
+      target: db_backups   # URL
 
+  database_config_env: production
 
-#bibliotech.yml on dev
-# used by commands like
-#   > rake bibliotech:remote_sync:down[production]   # production is default if omitted
-#   > rake bibliotech:remote_sync:up
-#   > cap bibliotech:remote_sync:down[production]  # uses Cap config, so URL below is unnecessary in config
-#
-remotes:
-  production: "root@appserver2.lrdesign.com:/var/www/eclipticenterprises.com/current"
-  staging:    "root@appserver2.lrdesign.com:/var/www/staging.eclipticenterprises.com/current"
+  user: root
+  host: some.server.com
+  path: "/var/www/someapp.com/current"
+  compress: gzip
+
+staging:
+  database_config_env: staging
+  path: "/var/www/staging.someapp.com/current"
+
+  user: root
+  host: some.server.com
+  backups:
+    compress: gzip
+
+development:
+  database_config_env: development
+  path: "."
+  rsa_files:
+    staging: "id_rsa"
+    production: "id_rsa"

@@ -1,6 +1,7 @@
 require 'bibliotech'
 require 'caliph'
 require 'valise'
+require 'bibliotech/backups/pruner'
 
 module BiblioTech
   class Application
@@ -37,7 +38,7 @@ module BiblioTech
     end
 
     def pruner(options)
-      Pruner.new(config.merge(options))
+      Backups::Pruner.new(config.merge(options))
     end
 
     def prune_list(options)
@@ -80,8 +81,8 @@ module BiblioTech
     end
 
     #return the latest dump of the DB
-    def latest(options)
-      pruner_list(options).most_recent.path
+    def latest(options = nil)
+      prune_list(options || {}).most_recent.path
     end
 
     def remote_cli(remote, command, options)

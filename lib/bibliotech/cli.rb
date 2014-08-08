@@ -1,3 +1,6 @@
+require 'thor'
+require 'bibliotech/application'
+
 module BiblioTech
   class CLI < Thor
     desc "latest", "Outputs the latest DB dump available locally"

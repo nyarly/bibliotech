@@ -5,8 +5,8 @@ module BiblioTech
   class Tasklib < ::Mattock::Tasklib
     setting(:app)
     setting(:config_path)
-    setting(:local)
-    setting(:remote)
+    setting(:local, nil)
+    setting(:remote, nil)
 
     def default_configuration
       super
@@ -14,11 +14,15 @@ module BiblioTech
 
       self.config_path = app.config_path
       from_hash(app.config.hash)
-      @default_state = to_hash.delete(:app, :config_path)
+      @default_state = to_hash
+      @default_state.delete(:app)
+      @default_state.delete(:config_path)
     end
 
     def resolve_configuration
-      configured_state = to_hash.delete(:app, :config_path)
+      configured_state = to_hash
+      configured_state.delete(:app)
+      configured_state.delete(:config_path)
       case [config_path == app.config_path, configured_state == to_hash.delete(:config_path)]
       when [false, false]
       when [true, true]

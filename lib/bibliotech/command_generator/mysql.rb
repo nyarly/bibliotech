@@ -7,6 +7,7 @@ module BiblioTech
         command.from('mysqldump')
         config.optional{ command.options << "-h #{config.host}" }
         config.optional{ command.options << "-u #{config.username}" }
+        config.optional{ command.options << "-P #{config.port}" }
         config.optional{ command.options << "--password='#{config.password}'" }
         command.options << "#{config.database}"
         command
@@ -20,6 +21,7 @@ module BiblioTech
         command.from('mysql')
         config.optional{ command.options << "-h #{config.host}" }
         config.optional{ command.options << "-u #{config.username}" }
+        config.optional{ command.options << "-P #{config.port}" }
         config.optional{ command.options << "--password='#{config.password}'" }
         command.options << "#{config.database}"
         command

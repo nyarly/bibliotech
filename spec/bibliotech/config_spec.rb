@@ -56,6 +56,16 @@ module BiblioTech
       end
     end
 
+    describe 'default config' do
+      let :valise do
+        Application.new.valise
+      end
+
+      subject :config do
+        Config.new(valise)
+      end
+    end
+
     describe "schedule shorthands" do
       let :config do
         Config.new(nil).tap do |config|

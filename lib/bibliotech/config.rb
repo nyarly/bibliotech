@@ -3,21 +3,28 @@ module BiblioTech
     class MissingConfig < KeyError; end
 
     CONFIG_STEPS = {
-      :database_config_file =>  [ "database_config_file" ]             ,
-      :database_config_env  =>  [ "database_config_env"  ]             ,
-      :file                 =>  [ "backups"              , "file"      ]  ,
-      :filename             =>  [ "backups"              , "filename"  ]  ,
-      :path                 =>  [ "backups"              , "dir"       ]  ,
-      :compressor           =>  [ "backups"              , "compress"  ]  ,
-      :prune_schedule       =>  [ "backups"              , "keep"      ]  ,
-      :backup_name          =>  [ "backups"              , "prefix"    ]  ,
-      :backup_frequency     =>  [ "backups"              , "frequency" ]  ,
-      :db_adapter           =>  [ "database_config"      , "adapter"   ]  ,
-      :db_host              =>  [ "database_config"      , "host"      ]  ,
-      :db_port              =>  [ "database_config"      , "port"      ]  ,
-      :db_database          =>  [ "database_config"      , "database"  ]  ,
-      :db_username          =>  [ "database_config"      , "username"  ]  ,
-      :db_password          =>  [ "database_config"      , "password"  ]  ,
+      :database_config_file => [ "database_config_file" ] ,
+      :database_config_env  => [ "database_config_env"  ] ,
+      :host                 => [ "host" ]                 ,
+      :port                 => [ "port" ]                 ,
+      :user                 => [ "user" ]                 ,
+      :rsa_files            => [ "rsa_files" ]            ,
+      :ssh_options          => [ "ssh_options" ]          ,
+      :file                 => [ "backups"                , "file"      ] ,
+      :filename             => [ "backups"                , "filename"  ] ,
+      :backup_path          => [ "backups"                , "dir"       ] ,
+      :root_path            => [ "path" ]                 ,
+      :fetch_dir            => [ "fetched_dir" ]          ,
+      :compressor           => [ "backups"                , "compress"  ] ,
+      :prune_schedule       => [ "backups"                , "keep"      ] ,
+      :backup_name          => [ "backups"                , "prefix"    ] ,
+      :backup_frequency     => [ "backups"                , "frequency" ] ,
+      :db_adapter           => [ "database_config"        , "adapter"   ] ,
+      :db_host              => [ "database_config"        , "host"      ] ,
+      :db_port              => [ "database_config"        , "port"      ] ,
+      :db_database          => [ "database_config"        , "database"  ] ,
+      :db_username          => [ "database_config"        , "username"  ] ,
+      :db_password          => [ "database_config"        , "password"  ] ,
     }
 
     def initialize(valise)
@@ -82,9 +89,13 @@ module BiblioTech
 
     def local_get(key)
       steps = steps_for(key)
-      extract(steps, [local] + steps)
-    rescue MissingConfig
-      extract(steps)
+      steps_chain =
+        begin
+          [steps, [local] + steps]
+        rescue MissingConfig
+          [steps]
+        end
+      extract(*steps_chain)
     end
 
     def remote_get(remote_name, key)
@@ -92,21 +103,61 @@ module BiblioTech
       extract(steps, ["remotes"] + steps)
     end
 
+    def ssh_options(for_remote)
+      steps = steps_for(:ssh_options) + [for_remote]
+      steps_chain =
+        begin
+          [steps, [local] + steps]
+        rescue MissingConfig
+          [steps]
+        end
+      extract(steps_chain)
+    end
+
+    def id_file(for_remote)
+      steps = steps_for(:rsa_files) + [for_remote]
+      steps_chain =
+        begin
+          [steps, [local] + steps]
+        rescue MissingConfig
+          [steps]
+        end
+      extract(steps_chain)
+    end
+
     def local_path
       local_get(:fetch_dir)
     rescue MissingConfig
-      local_get(:path)
+      local_get(:root_path)
     end
 
     def local_file(filename)
       File::join(local_path, filename)
     end
 
+    def root_dir_on(remote)
+      remote_get(remote, :root_path)
+    end
+
+    def remote_host(remote)
+      remote_get(remote, :host)
+    end
+
+    def remote_port(remote)
+      remote_get(remote, :port)
+    end
+
+    def remote_user(remote)
+      remote_get(remote, :user)
+    end
+
     def remote_path(remote)
-      path = "#{remote_get(remote, :host)}:#{remote_get(remote, :path)}"
-      "#{remote_get(remote, :user)}@#{path}"
-    rescue MissingConfig
-      path
+      path = "#{remote_host(remote)}:#{root_dir_on(remote)}"
+      begin
+        "#{remote_user(remote)}@#{path}"
+      rescue MissingConfig
+        path
+      end
     end
 
     def remote_file(remote, filename)
@@ -156,18 +207,18 @@ module BiblioTech
     end
 
     #@group File management
-    def file
+    def backup_file
       local_get(:file)
     rescue MissingConfig
-      ::File.join(path, filename)
+      ::File.join(backup_path, filename)
     end
 
     def filename
       local_get(:filename)
     end
 
-    def path
-      local_get(:path)
+    def backup_path
+      local_get(:backup_path)
     end
 
     def expander

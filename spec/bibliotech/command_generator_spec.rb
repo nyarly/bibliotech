@@ -1,9 +1,9 @@
 require 'spec_helper'
+require 'bibliotech/application'
 
 module BiblioTech
   describe CommandGenerator do
-
-      describe "class methods", :pending => true do
+    describe "class methods", :pending => true do
       describe "adapter lookup" do
         class CommandOne < CommandGenerator; end;
         class CommandTwo < CommandGenerator; end;
@@ -49,14 +49,33 @@ module BiblioTech
             expect(CommandGenerator.supported_adapters()).to eq([:type_1, :type_1a])
           end
         end
-
       end
     end
 
     describe "skeleton methods" do
-      let :generator do CommandGenerator.new(config) end
-      let :config do { :some => :values } end
-      let :filename do "filename" end
+      let :generator do
+        CommandGenerator.new(config)
+      end
+
+      let :app do
+        Application.new
+      end
+
+      let :config do
+        app.config
+      end
+
+      it "should produce a remote_cli command" do
+        expect(generator.remote_cli("staging", "latest").command).to match(/\Assh.*-- '.*bibliotech latest'\z/)
+      end
+
+      it "should produce a fetch command" do
+        expect(generator.fetch("staging", "latest.sql.gz").command).to match(/\Ascp.*@.*latest\.sql\.gz.*latest\.sql\.gz\z/)
+      end
+
+      it "should produce a push command" do
+        expect(generator.push("staging", "latest.sql.gz").command).to match(/\Ascp.*latest\.sql\.gz.*@.*latest\.sql\.gz\z/)
+      end
 
       it "should raise_error an error when calling wipe" do
         expect do
