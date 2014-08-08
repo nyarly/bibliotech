@@ -7,7 +7,7 @@ module BiblioTech
         command.from('pg_dump', '-Fc')
         config.optional{ command.options << "-h #{config.host}" }
         config.optional{ command.env["PGPASSWORD"] = config.password }
-        config.optional{ command.options << "-p #{config.port}" }
+        config.optional{ command.options << "-p #{config.port}" } #ok
 
         command.options << "-U #{config.username}"
         command.options << "#{config.database}"
@@ -22,7 +22,7 @@ module BiblioTech
         command.from('pg_restore')
         config.optional{ command.options << "-h #{config.host}" }
         config.optional{ command.env["PGPASSWORD"] = config.password }
-        config.optional{ command.options << "-p #{config.port}" }
+        config.optional{ command.options << "-p #{config.port}" } #ok
 
         command.options << "-U #{config.username}"
         command.options << "-d #{config.database}"
