@@ -32,7 +32,9 @@ Gem::Specification.new do |spec|
     lib/bibliotech/backups/prune_list.rb
     lib/bibliotech/backups/file_record.rb
     lib/bibliotech/application.rb
+    lib/bibliotech/cli.rb
     lib/bibliotech.rb
+    bin/bibliotech
     spec/spec_helper.rb
     spec/bibliotech/config_spec.rb
     spec/bibliotech/command_generator/postgres_spec.rb
@@ -53,6 +55,8 @@ Gem::Specification.new do |spec|
   spec.licenses = ["MIT"]
   spec.require_paths = %w[lib/]
   spec.rubygems_version = "1.3.5"
+
+  spec.executables = %w{ bibliotech }
 
   spec.has_rdoc		= true
   spec.extra_rdoc_files = Dir.glob("doc/**/*")
