@@ -32,7 +32,7 @@ to your Rakefile or in a lib/tasks file. You'll get some new tasks:
 
 You'll probably want to add:
 
-   * * * * * cd <project_root> && bundle exec rake bibliotech:backup
+   `* * * * * cd <project_root> && bundle exec rake bibliotech:backup`
 
 to the appropriate crontab. Bibliotech doesn't load the whole Rails stack, so
 it's quick to run the backup task when it isn't needed.
@@ -41,8 +41,8 @@ Configuration
 -------------
 
 The primary way to configure Bibliotech is by putting config.yaml files in its
-search path (/etc/bibliotech /usr/share/bibliotech ~/.bibliotech ./.bibliotech
-./config/bibliotech) - files will be loaded in order, and later files will
+search path `(/etc/bibliotech /usr/share/bibliotech ~/.bibliotech ./.bibliotech
+./config/bibliotech)` - files will be loaded in order, and later files will
 override the configuration of earlier files.
 
 Several configuration options can be overriden with options to various rake
