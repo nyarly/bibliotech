@@ -4,16 +4,11 @@ module BiblioTech
   module Builders
     class File < Base
       def self.find_class(config)
-        file = config.backup_file
-
         explicit = find_explicit(config)
         return explicit unless explicit.nil?
 
-        _, klass = adapter_registry.find{ |pattern, klass|
-          next if pattern.is_a? Symbol
-          file =~ pattern
-        }
-        klass || identity_adapter
+        file = config.backup_file
+        adapter_registry.fetch(file){ identity_adapter }
       rescue Config::MissingConfig
         return NullAdapter
       end
