@@ -1,7 +1,7 @@
 Gem::Specification.new do |spec|
   spec.name		= "bibliotech"
   #{MAJOR: incompatible}.{MINOR added feature}.{PATCH bugfix}-{LABEL}
-  spec.version		= "0.2.0"
+  spec.version		= "0.2.1"
   author_list = { "Evan Dorn" => 'evan@lrdesign.com', "Judson Lester" => 'judson@lrdesign.com' }
   spec.authors		= author_list.keys
   spec.email		= spec.authors.map {|name| author_list[name]}
@@ -17,6 +17,7 @@ Gem::Specification.new do |spec|
   # Do this: y$@"
   # !!find lib bin doc spec spec_help -not -regex '.*\.sw.' -type f 2>/dev/null
   spec.files		= %w[
+    default_configuration/config.yaml
     lib/bibliotech/builders.rb
     lib/bibliotech/builders/database.rb
     lib/bibliotech/builders/gzip.rb

@@ -7,7 +7,9 @@ module Corundum
   core = Core.new
 
   core.in_namespace do
-    GemspecFiles.new(core)
+    GemspecFiles.new(core) do |files|
+      files.extra_files = Rake::FileList["default_configuration/**/*"]
+    end
 
     #Also available: 'unfinished': TODO and XXX
     ["debug", "profanity", "ableism", "racism"].each do |type|
