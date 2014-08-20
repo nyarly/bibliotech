@@ -11,11 +11,13 @@ module BiblioTech
       end
 
       def end_time(file_list)
+        return Time.at(0) if file_list.empty?
         file_list.map{|record| record.timestamp}.max
       end
 
       def compute_start_time(file_list)
         limit_time = Time.at(0)
+        return limit_time if file_list.empty?
         unless limit.nil?
           limit_time = end_time(file_list) - limit * freq_seconds
         end

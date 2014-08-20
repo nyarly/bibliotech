@@ -66,6 +66,14 @@ module BiblioTech::Backups
         end
       end
 
+      context "when there are no backups yet" do
+        let(:unfiltered_files){ [] }
+
+        it "should return 0 kept files" do
+          expect(kept_files.count).to eql 0
+        end
+      end
+
       context "when there's more than enough backups" do
         let(:interval){ 60*60*12 }
         let(:frequency) { 15 }
