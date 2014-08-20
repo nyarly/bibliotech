@@ -25,6 +25,7 @@ module BiblioTech
     def config
       require 'yaml'
       app = App.new
+      puts "Loading from: #{app.valise.to_s}"
       puts YAML::dump(app.config.hash)
     end
   end
