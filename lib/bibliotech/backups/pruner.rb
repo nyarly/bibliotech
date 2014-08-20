@@ -28,6 +28,8 @@ module BiblioTech
       end
 
       def backup_needed?(time)
+        most_recent = most_recent()
+        return true if most_recent.nil?
         time - most_recent.timestamp < config.backup_frequency * 60
       end
 

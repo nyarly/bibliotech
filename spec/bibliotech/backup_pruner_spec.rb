@@ -7,15 +7,35 @@ module BiblioTech
 
     before :each do
       sandbox.new :directory => "db_backups"
-      sandbox.new :file => "db_backups/backup-2014-08-12_00:00.sql.7z"
     end
 
     let :app do
       App.new
     end
 
-    it "should something latest" do
-      expect(app.latest("local" => "production")).to eql "db_backups/backup-2014-08-12_00:00.sql.7z"
+    let :pruner do
+      app.pruner({:backups => {
+        :frequency => "daily",
+        :prefix => "testing",
+        :keep => {:daily => 100},
+        :dir => "db_backups"
+      }})
+    end
+
+    context "without existing files" do
+      it "should return true from #backup_needed?" do
+        expect(pruner.backup_needed?(Time.now.utc)).to be_truthy
+      end
+    end
+
+    context "with an existing file" do
+      before :each do
+        sandbox.new :file => "db_backups/backup-2014-08-12_00:00.sql.7z"
+      end
+
+      it "should something latest" do
+        expect(app.latest("local" => "production")).to eql "db_backups/backup-2014-08-12_00:00.sql.7z"
+      end
     end
 
   end
