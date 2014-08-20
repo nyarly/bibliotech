@@ -20,5 +20,12 @@ module BiblioTech
       app = App.new
       app.import(:backups => { :filename => file })
     end
+
+    desc "config", "Dumps the configuration as parsed"
+    def config
+      require 'yaml'
+      app = App.new
+      puts YAML::dump(app.config.hash)
+    end
   end
 end
