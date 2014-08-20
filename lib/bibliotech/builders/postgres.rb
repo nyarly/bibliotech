@@ -5,6 +5,8 @@ module BiblioTech
     module Postgres
       class Export < Builders::Export
         register :postgres
+        register :postgresql
+        register :postgis
 
         def go(command)
           command.from('pg_dump', '-Fc')
@@ -20,6 +22,8 @@ module BiblioTech
 
       class Import < Builders::Import
         register :postgres
+        register :postgresql
+        register :postgis
 
         def go(command)
           command.from('pg_restore')

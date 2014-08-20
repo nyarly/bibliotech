@@ -5,6 +5,7 @@ module BiblioTech
     module MySql
       class Export < Builders::Export
         register :mysql
+        register :mysql2
 
         def go(command)
           command.from('mysqldump')
@@ -19,6 +20,7 @@ module BiblioTech
 
       class Import < Builders::Import
         register :mysql
+        register :mysql2
 
         def go(command)
           command.from('mysql')
