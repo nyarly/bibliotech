@@ -22,6 +22,10 @@ module BiblioTech
       }})
     end
 
+    it "should generate a filename for current time" do
+      expect(pruner.filename_for(Time.now.utc)).to match(/testing/)
+    end
+
     context "without existing files" do
       it "should return true from #backup_needed?" do
         expect(pruner.backup_needed?(Time.now.utc)).to be_truthy

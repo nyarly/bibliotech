@@ -51,7 +51,7 @@ module BiblioTech
       end
 
       def filename_for(time)
-        PruneList.filename_for(time)
+        PruneList.filename_for(config.backup_name, time)
       end
 
       def pruneable
