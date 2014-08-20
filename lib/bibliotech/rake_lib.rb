@@ -41,6 +41,7 @@ module BiblioTech
     def define
       in_namespace do
         namespace :backups do
+          desc "Restore from a named DB backup"
           task :restore, [:name] do |task, args|
             fail ":name is required" if args[:name].nil?
             options = { :backups => { :filename => args[:name] } }
@@ -51,25 +52,34 @@ module BiblioTech
           end
 
           task :create, [:prefix] do |task, args|
-            fail ":prefix is required" if args[:prefix].nil?
-            app.create_backup( :backups => { :prefix => args[:prefix] } )
+            options = {}
+            unless args[:prefix].nil?
+              options[:backups] = {:prefix => args[:prefix]}
+            end
+            app.create_backup(options)
           end
 
           task :clean, [:prefix] do |task, args|
-            fail ":prefix is required" if args[:prefix].nil?
-            app.prune( :backups => { :prefix => args[:prefix] } )
+            options = {}
+            unless args[:prefix].nil?
+              options[:backups] = {:prefix => args[:prefix]}
+            end
+            app.prune(options)
           end
 
+          desc "Run DB backups, including cleaning up the resulting backups"
           task :perform, [:prefix] => [:create, :clean]
         end
 
         namespace :remote_sync do
+          desc "Pull the latest DB dump from the remote server into our local DB"
           task :down do
             filename = app.remote_cli(remote, "latest")
             app.get(remote, filename)
             app.import(:backups => { :filename => filename})
           end
 
+          desc "Push the latest local DB dump to the remote server's DB"
           task :up do
             filename = app.latest
             app.send(remote, filename)

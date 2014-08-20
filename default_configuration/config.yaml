@@ -3,22 +3,19 @@ remote: staging
 
 #defaults
 database_config_file: 'config/database.yml'   # this is the default
+backups:
+  dir: db_backups
+  compress:  gzip   # [ none, gzip, bzip2, 7zip ]
+  prefix: backup
 
 production:
   backups:
-    dir: db_backups
-    compress:  gzip   # [ none, gzip, bzip2, 7zip ]
-    prefix: backup
     keep:
       hourlies:   48
       dailies:    14
       weeklies:   8
       monthlies:  all
-
     frequency: hourly
-    clone:
-      storage: s3  [ file, ftp, scp ]
-      target: db_backups   # URL
 
   database_config_env: production
 
