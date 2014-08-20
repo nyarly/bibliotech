@@ -3,25 +3,31 @@ require 'spec_helper'
 
 module BiblioTech
   describe Config do
+    include FileSandbox
+
     describe 'initialization' do
+      before :each do
+        sandbox.new :file => 'config/database.yml', :with_contents => YAML::dump(
+          {
+          "development" =>
+          { "username" => 'root',
+            "database"  => 'dev_db',
+            "adapter"   => 'mysql',
+          },
+          "production" =>
+          { "username" => 'root',
+            "database"  => 'prod_db',
+            "adapter"   => 'mysql2',
+          }
+        })
+      end
+
       let :valise do
         Valise.define do
           defaults do
             file "config.yaml", {
-              "database_config_file" => "database.yml",
+              "database_config_file" => "config/database.yml",
               "database_config_env" => "development",
-            }
-            file "database.yml", {
-              "development" =>
-              { "username" => 'root',
-                "database"  => 'dev_db',
-                "adapter"   => 'mysql',
-              },
-              "production" =>
-              { "username" => 'root',
-                "database"  => 'prod_db',
-                "adapter"   => 'mysql2',
-              }
             }
           end
         end

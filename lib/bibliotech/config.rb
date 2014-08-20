@@ -203,7 +203,14 @@ module BiblioTech
     end
 
     def database_config
-      hash["database_config"] ||= valise.contents(local_get(:database_config_file))[local_get(:database_config_env)]
+      hash["database_config"] ||=
+        begin
+          db_config = YAML::load(File::read(local_get(:database_config_file)))
+          db_config.fetch(local_get(:database_config_env)) do
+            require 'pp'
+            raise KeyError, "No #{local_get(:database_config_env)} in #{db_config.pretty_inspect}"
+          end
+        end
     end
 
     #@group File management
