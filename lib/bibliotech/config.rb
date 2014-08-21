@@ -50,9 +50,19 @@ module BiblioTech
       hash
     end
 
+    def merge_hashes(left, right)
+      left.merge(right) do |key, ours, theirs|
+        if ours.is_a?(Hash) and theirs.is_a?(Hash)
+          merge_hashes(ours, theirs)
+        else
+          theirs
+        end
+      end
+    end
+
     def merge(other_hash)
       self.class.new(valise).tap do |newbie|
-        newbie.hash = hash.merge(stringify_keys(other_hash))
+        newbie.hash = merge_hashes(hash, stringify_keys(other_hash))
       end
     end
 
@@ -76,7 +86,7 @@ module BiblioTech
         rescue KeyError
         end
       end
-      raise MissingConfig, "No value configured at any of: #{steps_chain.map{|steps| steps.join(">")}}"
+      raise MissingConfig, "No value configured at any of: #{steps_chain.map{|steps| steps.join(">")}.join(", ")}"
     end
 
     def local

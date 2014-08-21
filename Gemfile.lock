@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    bibliotech (0.2.8)
+    bibliotech (0.2.9)
       caliph (~> 0.3.1)
       mattock (~> 0.8.0)
       thor (~> 0.19.1)
