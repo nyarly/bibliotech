@@ -78,7 +78,7 @@ module BiblioTech
 
     #clean up the DB dumps
     def prune(options=nil)
-      pruner(option || {}).go
+      pruner(options || {}).go
     end
 
     #return the latest dump of the DB
