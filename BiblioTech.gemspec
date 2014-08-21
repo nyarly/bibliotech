@@ -1,7 +1,7 @@
 Gem::Specification.new do |spec|
   spec.name		= "bibliotech"
   #{MAJOR: incompatible}.{MINOR added feature}.{PATCH bugfix}-{LABEL}
-  spec.version		= "0.2.11"
+  spec.version		= "0.2.12"
   author_list = { "Evan Dorn" => 'evan@lrdesign.com', "Judson Lester" => 'judson@lrdesign.com' }
   spec.authors		= author_list.keys
   spec.email		= spec.authors.map {|name| author_list[name]}

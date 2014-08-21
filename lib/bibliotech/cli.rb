@@ -6,7 +6,7 @@ module BiblioTech
     desc "latest", "Outputs the latest DB dump available locally"
     def latest
       app = App.new
-      app.latest
+      puts app.latest
     end
 
     desc "dump FILENAME", "Create a new database dump into FILE"
