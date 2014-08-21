@@ -203,12 +203,16 @@ module BiblioTech
     end
 
     def each_prune_schedule
-      local_get(:prune_schedule).each do |frequency, limit|
+      local_get(:prune_schedule).map do |frequency, limit|
         real_frequency = regularize_frequency(frequency)
         unless real_frequency % backup_frequency == 0
           raise "Pruning frequency #{real_frequency}:#{frequency} is not a multiple of backup frequency: #{backup_frequency}:#{local_get(:backup_frequency)}"
         end
-        yield(real_frequency, limit)
+        [real_frequency, limit]
+      end.sort_by do |frequency, limit|
+        frequency
+      end.each do |frequency, limit|
+        yield(frequency, limit)
       end
     end
 

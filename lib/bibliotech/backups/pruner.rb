@@ -30,18 +30,17 @@ module BiblioTech
       def backup_needed?(time)
         most_recent = most_recent()
         return true if most_recent.nil?
-        time - most_recent.timestamp < config.backup_frequency * 60
+        (time - most_recent.timestamp) > (config.backup_frequency * 60)
       end
 
       def list
-        @list ||=
-          begin
-            list = PruneList.new(path, name).list
-            schedules.each do |schedule|
-              schedule.mark(list)
-            end
-            list
-          end
+        @list ||= PruneList.new(path, name).list
+      end
+
+      def mark_list
+        schedules.each do |schedule|
+          schedule.mark(list)
+        end
       end
 
       def most_recent
@@ -55,6 +54,7 @@ module BiblioTech
       end
 
       def pruneable
+        mark_list
         list.select do |record|
           !record.keep?
         end

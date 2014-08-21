@@ -42,6 +42,25 @@ module BiblioTech
       end
     end
 
+    context "with a recent file" do
+      before :each do
+        sandbox.new :file => "db_backups/#{pruner.filename_for(Time.now.utc - 120)}"
+      end
+
+      it "should return false from #backup_needed?" do
+        expect(pruner.backup_needed?(Time.now.utc)).to be_falsey
+      end
+    end
+
+    context "with an old file" do
+      before :each do
+        sandbox.new :file => "db_backups/#{pruner.filename_for(Time.now.utc - (24 * 60 * 60 + 120))}"
+      end
+
+      it "should return true from #backup_needed?" do
+        expect(pruner.backup_needed?(Time.now.utc)).to be_truthy
+      end
+    end
   end
 
   describe Backups::PruneList do

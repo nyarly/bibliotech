@@ -89,7 +89,7 @@ module BiblioTech::Backups
         let(:frequency){ 60*8 }
         let(:test_jitter){ 60 }
 
-        it "should mark 8 files kept" do
+        it "should mark 5 files kept" do
           expect(kept_files.count).to eql 5
         end
       end
