@@ -1,8 +1,10 @@
 require 'cadre/simplecov/vim-formatter'
+require 'simplecov-json'
 require 'codeclimate-test-reporter'
 formatters = [
   SimpleCov::Formatter::HTMLFormatter,
   Cadre::SimpleCov::VimFormatter,
+  SimpleCov::Formatter::JSONFormatter
   ]
 if !ENV["CODECLIMATE_REPO_TOKEN"].nil?
   formatters << CodeClimate::TestReporter::Formatter

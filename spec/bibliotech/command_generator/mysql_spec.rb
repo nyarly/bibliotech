@@ -18,7 +18,7 @@ module BiblioTech
     let( :filename )  { "export.sql"  }
     let( :path     )  { "/some/path"  }
 
-    let :base_config_hash do
+      let :base_config_hash do
       { "database_config" => {
         "adapter" => :mysql,
         "database" => db_name,
@@ -158,7 +158,7 @@ module BiblioTech
 
             it { expect(command).to be_a(Caliph::PipelineChain) }
             it { expect(first_cmd.executable).to eq('gunzip') }
-            it { expect(first_cmd.options).to eq(["#{path}/#{filename}.gz"]) }
+            it { expect(first_cmd.options).to eq(["-c", "#{path}/#{filename}.gz"]) }
           end
         end
       end

@@ -3,11 +3,13 @@ require 'bibliotech/builders/file'
 module BiblioTech
   module Builders
     class GzipExpander < FileInput
-      register(/.*\.gz\z/)
-      register(/.*\.gzip\z/)
+      PATTERNS = [ /.*\.gz\z/, /.*\.gzip\z/ ]
+      PATTERNS.each do |pattern|
+        register pattern
+      end
 
       def go(command)
-        command = cmd("gunzip", file) | command
+        command = cmd("gunzip", "-c", file) | command
       end
     end
 

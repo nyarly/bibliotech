@@ -70,7 +70,7 @@ Gem::Specification.new do |spec|
   spec.rdoc_options	+= ["--title", "#{spec.name}-#{spec.version} Documentation"]
 
   spec.add_dependency("caliph", "~> 0.3.1")
-  spec.add_dependency("mattock", "~> 0.8.0")
+  spec.add_dependency("mattock", "~> 0.9.0")
   spec.add_dependency("valise", "~> 1.1.1")
   spec.add_dependency("thor", "~> 0.19.1")
 

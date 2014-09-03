@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
 gem 'codeclimate-test-reporter', group: :ci, require: nil
-gem 'corundum'
+gem 'corundum', "~> 0.4.1"
 gem 'pry'
 gem 'cadre'
 
