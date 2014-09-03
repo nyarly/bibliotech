@@ -70,7 +70,7 @@ module BiblioTech
       end
 
       it "should produce a fetch command" do
-        expect(generator.fetch("staging", "latest.sql.gz").command).to match(/\Ascp.*@.*latest\.sql\.gz.*latest\.sql\.gz\z/)
+        expect(generator.fetch("staging", "latest.sql.gz").command).to match(/scp.*@.*latest\.sql\.gz.*latest\.sql\.gz\z/)
       end
 
       it "should produce a push command" do

@@ -171,7 +171,7 @@ module BiblioTech
 
             it { expect(command).to be_a(Caliph::PipelineChain) }
             it { expect(first_cmd.executable).to eq('gunzip') }
-            it { expect(first_cmd.options).to eq(["#{path}/#{filename}.gz"]) }
+            it { expect(first_cmd.options).to eq(["-c", "#{path}/#{filename}.gz"]) }
           end
         end
       end
