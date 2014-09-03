@@ -74,16 +74,19 @@ module BiblioTech
         namespace :remote_sync do
           desc "Pull the latest DB dump from the remote server into our local DB"
           task :down do
-            filename = app.remote_cli(remote, "latest")
-            app.get(remote, filename)
-            app.import(:backups => { :filename => filename})
+            result = app.remote_cli(remote, "latest")
+            result.must_succeed!
+            filename = result.stdout.chomp
+
+            app.get(remote, filename).must_succeed!
+            app.import(:backups => { :file => app.config.local_file(filename)}).must_succeed!
           end
 
           desc "Push the latest local DB dump to the remote server's DB"
           task :up do
             filename = app.latest
-            app.send(remote, filename)
-            app.remote_cli(remote, "load", filename)
+            app.send(remote, filename).must_succeed!
+            app.remote_cli(remote, "load", filename).must_succeed!
           end
         end
       end

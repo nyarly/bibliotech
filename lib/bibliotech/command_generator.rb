@@ -31,10 +31,14 @@ module BiblioTech
 
     def fetch(remote, filename, options = nil)
       options = config.merge(options || {})
-      cmd("scp") do |cmd|
+      local_path = options.local_file(filename)
+      cmd("mkdir") do |cmd|
+        cmd.options << "-p"
+        cmd.options << File::dirname(local_path)
+      end & cmd("scp") do |cmd|
         options.optionally{ cmd.options << "-i #{options.id_file(remote)}" }
         cmd.options << options.remote_file(remote, filename)
-        cmd.options << options.local_file(filename)
+        cmd.options << local_path
       end
     end
 

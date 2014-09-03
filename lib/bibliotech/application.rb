@@ -67,13 +67,13 @@ module BiblioTech
     end
 
     #pull a dump from a remote
-    def get(options)
-      @shell.run(commands.fetch(options))
+    def get(remote, options)
+      @shell.run(commands.fetch(remote, options))
     end
 
     #push a dump to a remote
-    def send(options)
-      @shell.run(commands.push(options))
+    def send(remote, options)
+      @shell.run(commands.push(remote, options))
     end
 
     #clean up the DB dumps
@@ -86,8 +86,8 @@ module BiblioTech
       pruner(options || {}).most_recent.path
     end
 
-    def remote_cli(remote, command, options)
-      @shell.run(commands.ssh_cli(remote, command, options))
+    def remote_cli(remote, command, *options)
+      @shell.run(commands.remote_cli(remote, command, *options))
     end
   end
 

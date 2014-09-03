@@ -5,16 +5,16 @@ module BiblioTech
     CONFIG_STEPS = {
       :database_config_file => [ "database_config_file" ] ,
       :database_config_env  => [ "database_config_env"  ] ,
+      :root_path            => [ "path" ]                 ,
       :host                 => [ "host" ]                 ,
       :port                 => [ "port" ]                 ,
       :user                 => [ "user" ]                 ,
       :rsa_files            => [ "rsa_files" ]            ,
       :ssh_options          => [ "ssh_options" ]          ,
+      :fetch_dir            => [ "fetched_dir" ]          ,
       :file                 => [ "backups"                , "file"      ] ,
       :filename             => [ "backups"                , "filename"  ] ,
       :backup_path          => [ "backups"                , "dir"       ] ,
-      :root_path            => [ "path" ]                 ,
-      :fetch_dir            => [ "fetched_dir" ]          ,
       :compressor           => [ "backups"                , "compress"  ] ,
       :prune_schedule       => [ "backups"                , "keep"      ] ,
       :backup_name          => [ "backups"                , "prefix"    ] ,
@@ -244,9 +244,9 @@ module BiblioTech
 
     def expander
       if remote.nil?
-        local_get(:expander)
+        local_get(:compressor)
       else
-        remote_get(remote, :expander)
+        remote_get(remote, :compressor)
       end
     end
 
