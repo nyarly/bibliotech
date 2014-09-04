@@ -10,20 +10,6 @@ module BiblioTech
         @limit = nil if limit == "all"
       end
 
-      def end_time(file_list)
-        return Time.at(0) if file_list.empty?
-        file_list.map{|record| record.timestamp}.max
-      end
-
-      def compute_start_time(file_list)
-        limit_time = Time.at(0)
-        return limit_time if file_list.empty?
-        unless limit.nil?
-          limit_time = end_time(file_list) - limit * freq_seconds
-        end
-        [limit_time, file_list.map{|record| record.timestamp}.min - range].max
-      end
-
       def freq_seconds
         frequency * 60
       end
@@ -32,19 +18,44 @@ module BiblioTech
         freq_seconds / 2
       end
 
-      def mark(file_list)
-        time = end_time(file_list)
-        start_time = compute_start_time(file_list)
-        while time > start_time do
-          closest = file_list.min_by do |record|
-            (record.timestamp - time).abs
+      # The earliest possible time to keep a file in.
+      def compute_earliest_time(file_list)
+        limit_time = Time.at(0)
+        return limit_time if file_list.empty?
+        unless limit.nil?
+          limit_time = latest_time(file_list) - limit * freq_seconds
+        end
+        [limit_time, file_list.last.timestamp - range].max
+      end
+
+      # The latest possible time to keep a file in.
+      def latest_time(file_list)
+        return Time.at(0) if file_list.empty?
+        file_list.first.timestamp
+      end
+
+      # Working from the latest time backwards, mark the closest file to the
+      # appropriate frequencies as keepable
+      def mark(original_file_list)
+        file_list = original_file_list.sort_by{|record| -record.timestamp.to_i} #sort from newest to oldest
+
+        time = latest_time(file_list)
+        earliest_time = compute_earliest_time(file_list)
+        while time > earliest_time do
+          file_list.delete_if do |record|
+            record.timestamp > time
           end
-          if (closest.timestamp - time).abs < range
+
+          break if file_list.empty?
+
+          closest = file_list.first
+
+          if (time - closest.timestamp) < freq_seconds
             closest.keep = true
           end
           time -= freq_seconds
         end
-        return file_list
+        return original_file_list
       end
     end
   end

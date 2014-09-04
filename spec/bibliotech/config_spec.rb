@@ -144,12 +144,13 @@ module BiblioTech
             "keep" => {
             "hourlies" => 24,
             "daily" => 7,
-            "weeklies" => 4
+            "weeklies" => 4,
+            "monthly" => "all"
           }}}
         end
 
         it "should produce correct schedule" do
-          expect(schedule_array).to contain_exactly([60, 24], [60*24, 7], [60*24*7, 4])
+          expect(schedule_array).to contain_exactly([60, 24], [60*24, 7], [60*24*7, 4], [60*24*30, nil])
         end
       end
     end

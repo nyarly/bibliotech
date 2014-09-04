@@ -5,7 +5,7 @@ module BiblioTech::Backups
     let(:test_jitter){ 0 }
 
     let :unfiltered_files do
-      (0..interval).step(frequency).map do |seconds| #every 15 seconds for 8 hours
+      (0..interval).step(frequency).map do |seconds| #e.g. every 15 seconds for 8 hours
         seconds = seconds - test_jitter/2 + rand(test_jitter)
         FileRecord.new("", Time.now - seconds)
       end
@@ -27,12 +27,12 @@ module BiblioTech::Backups
       end
 
       context "when there's more than enough backups" do
-        let(:interval){ 60*60*12 - 1}
+        let(:interval){ 60*60*12 - test_jitter}
         let(:frequency) { 15 }
         let(:test_jitter){ 60 }
 
         it "should mark 8 files kept" do
-          expect(kept_files.count).to eql 13
+          expect(kept_files.count).to eql 12
         end
       end
     end
@@ -43,7 +43,7 @@ module BiblioTech::Backups
       end
 
       context "when there's just enough backups" do
-        let(:interval){ 60*60*8 - 1 }
+        let(:interval){ 60*60*8 - test_jitter }
         let(:frequency){ 60*8 }
         let(:test_jitter){ 60 }
 
@@ -85,12 +85,12 @@ module BiblioTech::Backups
       end
 
       context "when there are too few backups" do
-        let(:interval){ 60*60*4 - 1 }
+        let(:interval){ 60*60*4 - test_jitter }
         let(:frequency){ 60*8 }
         let(:test_jitter){ 60 }
 
-        it "should mark 5 files kept" do
-          expect(kept_files.count).to eql 5
+        it "should mark 4 files kept" do
+          expect(kept_files.count).to eql 4
         end
       end
 
