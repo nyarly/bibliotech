@@ -13,11 +13,15 @@ module BiblioTech
       App.new
     end
 
+    let :schedule do
+      {:daily => 100}
+    end
+
     let :pruner do
       app.pruner({:backups => {
         :frequency => "daily",
         :prefix => "testing",
-        :keep => {:daily => 100},
+        :keep => schedule,
         :dir => "db_backups"
       }})
     end

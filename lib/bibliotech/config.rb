@@ -208,6 +208,13 @@ module BiblioTech
         unless real_frequency % backup_frequency == 0
           raise "Pruning frequency #{real_frequency}:#{frequency} is not a multiple of backup frequency: #{backup_frequency}:#{local_get(:backup_frequency)}"
         end
+        limit =
+          case limit
+          when "all"
+            nil
+          else
+            Integer(limit)
+          end
         [real_frequency, limit]
       end.sort_by do |frequency, limit|
         frequency
