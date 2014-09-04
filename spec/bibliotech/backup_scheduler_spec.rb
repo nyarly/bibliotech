@@ -27,7 +27,7 @@ module BiblioTech::Backups
       end
 
       context "when there's more than enough backups" do
-        let(:interval){ 60*60*12 - 1}
+        let(:interval){ 60*60*12 - test_jitter}
         let(:frequency) { 15 }
         let(:test_jitter){ 60 }
 
@@ -43,7 +43,7 @@ module BiblioTech::Backups
       end
 
       context "when there's just enough backups" do
-        let(:interval){ 60*60*8 - 1 }
+        let(:interval){ 60*60*8 - test_jitter }
         let(:frequency){ 60*8 }
         let(:test_jitter){ 60 }
 
@@ -85,7 +85,7 @@ module BiblioTech::Backups
       end
 
       context "when there are too few backups" do
-        let(:interval){ 60*60*4 - 1 }
+        let(:interval){ 60*60*4 - test_jitter }
         let(:frequency){ 60*8 }
         let(:test_jitter){ 60 }
 
