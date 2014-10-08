@@ -2,9 +2,12 @@ require 'bibliotech'
 require 'caliph'
 require 'valise'
 require 'bibliotech/backups/pruner'
+require 'bibliotech/logger'
 
 module BiblioTech
   class Application
+    include Logging
+
     attr_accessor :config_path, :config_hash
     attr_writer :shell
 
@@ -30,7 +33,19 @@ module BiblioTech
     end
 
     def config
-      @memos[:config] ||= Config.new(valise)
+      @memos[:config] ||=
+        begin
+          Config.new(valise).tap do |config|
+            setup_logger(config)
+          end
+        end
+    end
+
+    def setup_logger(config)
+      logger = Logger.new(config.log_target)
+      logger.level = config.log_level
+      BiblioTech::Logging.logger = logger
+      log.info("Started logging")
     end
 
     def commands

@@ -1,10 +1,12 @@
 require 'bibliotech/backups/prune_list'
 require 'bibliotech/backups/file_record'
 require 'bibliotech/backups/scheduler'
+require 'bibliotech/logger'
 
 module BiblioTech
   module Backups
     class Pruner
+      include Logging
       def initialize(config)
         @config = config
       end
@@ -55,6 +57,14 @@ module BiblioTech
 
       def pruneable
         mark_list
+        if list.empty?
+          log.warn{ "No backup files in #{path} / #{name} !" }
+        end
+        list.each do |record|
+          log.info{
+            "#{record.path} #{record.timestamp} #{record.keep ? "kept: #{record.scheduled_by.inspect}" : "discarding"}"
+          }
+        end
         list.select do |record|
           !record.keep?
         end

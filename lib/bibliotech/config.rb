@@ -12,6 +12,8 @@ module BiblioTech
       :rsa_files            => [ "rsa_files" ]            ,
       :ssh_options          => [ "ssh_options" ]          ,
       :fetch_dir            => [ "fetched_dir" ]          ,
+      :log_target           => [ "log"                    , "target"    ],
+      :log_level            => [ "log"                    , "level"     ],
       :file                 => [ "backups"                , "file"      ] ,
       :filename             => [ "backups"                , "filename"  ] ,
       :backup_path          => [ "backups"                , "dir"       ] ,
@@ -111,6 +113,29 @@ module BiblioTech
     def remote_get(remote_name, key)
       steps = [remote_name] + steps_for(key)
       extract(steps, ["remotes"] + steps)
+    end
+
+    def log_target
+      target_path = local_get(:log_target)
+      case target_path
+      when "STDERR", "stderr"
+        return $stderr
+      when "STDOUT", "stdout"
+        return $stdout
+      else
+        return File.open(target_path, "w")
+      end
+    rescue
+      warn "Trouble opening configured log file - logging to stderr"
+      return $STDERR
+    end
+
+    def log_level
+      level = "debug"
+      optionally do
+        level = local_get(:log_level)
+      end
+      return BiblioTech::Logging.log_level(level)
     end
 
     def ssh_options(for_remote)

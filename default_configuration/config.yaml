@@ -7,6 +7,9 @@ backups:
   dir: db_backups
   compress:  gzip   # [ none, gzip, bzip2, 7zip ]
   prefix: backup
+log:
+  target: stderr
+  level: debug
 
 production:
   backups:

@@ -61,6 +61,10 @@ module BiblioTech
         sandbox.new :file => "db_backups/#{pruner.filename_for(Time.now.utc - (24 * 60 * 60 + 120))}"
       end
 
+      it "should should log pruneables" do
+        pruner.pruneable
+      end
+
       it "should return true from #backup_needed?" do
         expect(pruner.backup_needed?(Time.now.utc)).to be_truthy
       end

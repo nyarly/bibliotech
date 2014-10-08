@@ -3,9 +3,10 @@ require 'bibliotech/backups/file_record'
 module BiblioTech
   module Backups
     class Scheduler
-      attr_accessor :frequency, :limit
+      attr_accessor :frequency, :limit, :name
 
       def initialize(frequency, limit)
+        @name = frequency
         @frequency, @limit = frequency, limit
         @limit = nil if limit == "all"
       end
@@ -51,7 +52,7 @@ module BiblioTech
           closest = file_list.first
 
           if (time - closest.timestamp) < freq_seconds
-            closest.keep = true
+            closest.in_schedule(name)
           end
           time -= freq_seconds
         end
