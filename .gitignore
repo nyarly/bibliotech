@@ -13,3 +13,4 @@ yardoc/
 gh-pages/
 .sass-cache/
 .cadre/
+tmp/

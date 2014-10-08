@@ -1,0 +1,2 @@
+log:
+  target: tmp/test.log

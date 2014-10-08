@@ -123,10 +123,13 @@ module BiblioTech
       when "STDOUT", "stdout"
         return $stdout
       else
-        return File.open(target_path, "w")
+        require 'fileutils'
+        FileUtils.mkdir_p(File.dirname(target_path))
+        return File.open(target_path, "a")
       end
     rescue
       warn "Trouble opening configured log file - logging to stderr"
+      warn $!.inspect
       return $STDERR
     end
 

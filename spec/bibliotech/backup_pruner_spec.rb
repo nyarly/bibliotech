@@ -7,6 +7,7 @@ module BiblioTech
 
     before :each do
       sandbox.new :directory => "db_backups"
+      sandbox.new :file => '.bibliotech/config.yaml', :with_contents => "log:\n  target: ../tmp/test.log"
     end
 
     let :app do
