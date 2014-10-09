@@ -148,7 +148,7 @@ module BiblioTech
 
         it { expect(command.redirections).to eq(["0<#{path}/#{filename}"]) }
         it { expect(command.executable).to eq('pg_restore')}
-        it { expect(command.options).to eq(["-U #{username}", "-d #{db_name}" ]) }
+        it { expect(command.options).to eq(["-Oc", "-U #{username}", "-d #{db_name}" ]) }
 
         context "plus password" do
           let :config_hash do
@@ -157,7 +157,7 @@ module BiblioTech
             end
           end
 
-          it { expect(command.options).to eq(["-U #{username}", "-d #{db_name}"]) }
+          it { expect(command.options).to eq(["-Oc", "-U #{username}", "-d #{db_name}"]) }
           it { expect(command.env['PGPASSWORD']).to eq(password) }
 
           context 'and compressor' do
