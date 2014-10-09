@@ -25,6 +25,7 @@ Gem::Specification.new do |spec|
     lib/bibliotech/builders/postgres.rb
     lib/bibliotech/builders/mysql.rb
     lib/bibliotech/config.rb
+    lib/bibliotech/logger.rb
     lib/bibliotech/command_runner.rb
     lib/bibliotech/command_generator.rb
     lib/bibliotech/rake_lib.rb
