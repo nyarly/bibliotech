@@ -39,7 +39,7 @@ module BiblioTech
       options = config.merge(options || {})
       local_path = options.local_file(filename)
       cmd("mkdir") do |cmd|
-        cmd.options << "--parents"
+        cmd.options << "-p" #ok Mac OS X doesn't have --parents in its mkdir
         cmd.options << File::dirname(local_path)
       end & cmd("scp") do |cmd|
         options.optionally{ cmd.options << "-i #{options.id_file(remote)}" }

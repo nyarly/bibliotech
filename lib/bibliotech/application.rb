@@ -9,7 +9,8 @@ module BiblioTech
     attr_accessor :config_path, :config_hash
     attr_writer :shell
 
-    def initialize
+    def initialize(config = nil)
+      @configs = config || {}
       @memos = {}
       @shell = Caliph.new
       @config_path = %w{/etc/bibliotech /usr/share/bibliotech ~/.bibliotech ./.bibliotech ./config/bibliotech}
@@ -31,7 +32,7 @@ module BiblioTech
     end
 
     def config
-      @memos[:config] ||= Config.new(valise)
+      @memos[:config] ||= Config.new(valise).merge(@configs)
     end
 
     def log

@@ -5,7 +5,7 @@ module BiblioTech
   class CLI < Thor
     desc "latest", "Outputs the latest DB dump available locally"
     def latest
-      app = App.new
+      app = App.new(:log => { :target => "/dev/null" })
       puts app.latest
     end
 
