@@ -27,6 +27,7 @@ module BiblioTech
 
         def go(command)
           command.from('pg_restore')
+          command.options << '-Oc' #Don't assign ownership, clean entries
           config.optional{ command.options << "-h #{config.host}" }
           config.optional{ command.env["PGPASSWORD"] = config.password }
           config.optional{ command.options << "-p #{config.port}" } #ok
