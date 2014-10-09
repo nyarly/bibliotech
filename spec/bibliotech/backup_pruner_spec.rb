@@ -1,5 +1,6 @@
 require 'bibliotech/application'
 require 'bibliotech/backups/pruner'
+require 'bibliotech/backups/scheduler'
 require 'file-sandbox'
 module BiblioTech
   describe Backups::Pruner do
@@ -18,13 +19,17 @@ module BiblioTech
       {:daily => 100}
     end
 
+    let :config do
+      double(Config).tap do |config|
+        allow(config).to receive(:backup_path){ "db_backups" }
+        allow(config).to receive(:backup_name){ "testing" }
+        allow(config).to receive(:backup_frequency){ 60 * 24 }
+        allow(config).to receive(:schedules){ [ Backup::Scheduler.new("daily", 60 * 24, 100) ] }
+      end
+    end
+
     let :pruner do
-      app.pruner({:backups => {
-        :frequency => "daily",
-        :prefix => "testing",
-        :keep => schedule,
-        :dir => "db_backups"
-      }})
+      Backups::Pruner.new(config)
     end
 
     it "should generate a filename for current time" do
@@ -62,12 +67,117 @@ module BiblioTech
         sandbox.new :file => "db_backups/#{pruner.filename_for(Time.now.utc - (24 * 60 * 60 + 120))}"
       end
 
-      it "should should log pruneables" do
-        pruner.pruneable
-      end
-
       it "should return true from #backup_needed?" do
         expect(pruner.backup_needed?(Time.now.utc)).to be_truthy
+      end
+    end
+
+    context "marking for pruning" do
+      before :each do
+        allow(config).to receive(:prune_schedules){
+          [
+            Backups::Scheduler.new("hourlies", 60, 48),
+            Backups::Scheduler.new("dailies", 24 * 60, 14),
+            Backups::Scheduler.new("weeklies", 7 * 24 * 60, 8),
+            Backups::Scheduler.new("monthlies", 30 * 24 * 60, nil)
+          ]
+        }
+
+        Logging.log.debug{ "Start test" }
+      end
+
+      it "should have schedules" do
+        expect(pruner.schedules.length).to eq(4)
+      end
+
+      it "should keep single backup" do
+        sandbox.new :file => "db_backups/#{pruner.filename_for(Time.now.utc)}"
+
+        expect(pruner.pruneable).to be_empty
+
+        expect(pruner.list.length).to eq(1)
+        pruner.list.each do |record|
+          expect(record.keep?).to eq(true)
+        end
+      end
+
+      it "should keep 48 hours of backup" do
+        now = Time.now.utc
+        (0..47).each do |interval|
+          sandbox.new :file => "db_backups/#{pruner.filename_for(Time.now.utc - interval * 60 * 60)}"
+        end
+
+        expect(pruner.pruneable).to be_empty
+
+        expect(pruner.list.length).to eq(48)
+        pruner.list.each do |record|
+          expect(record.keep?).to eq(true)
+        end
+      end
+
+      it "should prune old backups" do
+        now = Time.now.utc
+        (0..470).each do |interval|
+          sandbox.new :file => "db_backups/#{pruner.filename_for(now - interval * 60 * 60)}"
+        end
+
+        expect(pruner.pruneable.length).to eq(471 - 48 - (14 - 2) - 1) # 2 dailies hourly etc.
+
+        expect(pruner.list.length).to eq(471)
+      end
+
+
+      context "repruning" do
+        shared_examples_for "well mannered pruner" do
+          it "should not re-prune old backups" do
+            (0..47).each do |interval|
+              sandbox.new :file => "db_backups/#{pruner.filename_for(now - interval * 60 * 60)}"
+            end
+            (0..11).each do |interval|
+              sandbox.new :file => "db_backups/#{pruner.filename_for(now - 48 * 60 * 60 - interval * 24 * 60 * 60)}"
+            end
+            sandbox.new :file => "db_backups/#{pruner.filename_for(now - 48 * 60 * 60 - 12 * 24 * 60 * 60 - 7 * 24 * 60 * 60)}"
+
+            expect(pruner.pruneable).to be_empty
+
+            expect(pruner.list.length).to eq(48 + 12 + 1)
+            pruner.list.each do |record|
+              expect(record.keep?).to eq(true)
+            end
+          end
+        end
+
+        context "right now" do
+          it_behaves_like "well mannered pruner" do
+            let :now do
+              Time.now.utc
+            end
+          end
+        end
+
+        context "30 minutes ago" do
+          it_behaves_like "well mannered pruner" do
+            let :now do
+              Time.now.utc - 30 * 60
+            end
+          end
+        end
+
+        context "60 minutes ago" do
+          it_behaves_like "well mannered pruner" do
+            let :now do
+              Time.now.utc - 60 * 60
+            end
+          end
+        end
+
+        context "90 minutes ago" do
+          it_behaves_like "well mannered pruner" do
+            let :now do
+              Time.now.utc - 90 * 60
+            end
+          end
+        end
       end
     end
   end

@@ -1,6 +1,5 @@
 require 'bibliotech/backups/prune_list'
 require 'bibliotech/backups/file_record'
-require 'bibliotech/backups/scheduler'
 require 'bibliotech/logger'
 
 module BiblioTech
@@ -21,18 +20,17 @@ module BiblioTech
       end
 
       def schedules
-        @schedules ||=
-          [].tap do |array|
-          config.each_prune_schedule do |frequency, limit|
-            array << Scheduler.new(frequency, limit)
-          end
-          end
+        @schedules ||= config.prune_schedules
+      end
+
+      def frequency
+        @frequency ||= config.backup_frequency
       end
 
       def backup_needed?(time)
         most_recent = most_recent()
         return true if most_recent.nil?
-        (time - most_recent.timestamp) > (config.backup_frequency * 60)
+        (time - most_recent.timestamp) > (frequency * 60)
       end
 
       def list
@@ -52,7 +50,7 @@ module BiblioTech
       end
 
       def filename_for(time)
-        PruneList.filename_for(config.backup_name, time)
+        PruneList.filename_for(name, time)
       end
 
       def pruneable

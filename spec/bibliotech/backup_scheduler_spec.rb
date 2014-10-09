@@ -23,7 +23,7 @@ module BiblioTech::Backups
 
     describe "without a limit" do
       let :scheduler do
-        Scheduler.new(60, nil)
+        Scheduler.new("hourly", 60, nil)
       end
 
       context "when there's more than enough backups" do
@@ -39,7 +39,7 @@ module BiblioTech::Backups
 
     describe "with a limit" do
       let :scheduler do
-        Scheduler.new(60, 8)
+        Scheduler.new("hourly", 60, 8)
       end
 
       context "when there's just enough backups" do

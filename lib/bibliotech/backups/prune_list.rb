@@ -19,7 +19,9 @@ module BiblioTech
             files << file_record
           end
         end
-        files
+        files.sort_by do |record|
+          - record.timestamp.to_i
+        end
       end
 
       def prefix_timestamp_re

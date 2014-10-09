@@ -13,6 +13,7 @@ module BiblioTech
     def log
       return BiblioTech::Logging.logger
     end
+    module_function :log
 
     def self.log_level(string)
       case string

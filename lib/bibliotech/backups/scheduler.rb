@@ -5,8 +5,8 @@ module BiblioTech
     class Scheduler
       attr_accessor :frequency, :limit, :name
 
-      def initialize(frequency, limit)
-        @name = frequency
+      def initialize(name, frequency, limit)
+        @name = name
         @frequency, @limit = frequency, limit
         @limit = nil if limit == "all"
       end

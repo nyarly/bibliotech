@@ -89,10 +89,8 @@ module BiblioTech
       end
 
       let :schedule_array do
-        [].tap do |array|
-          config.each_prune_schedule do |freq, lim|
-            array << [freq, lim]
-          end
+        config.prune_schedules.map do |sched|
+          [sched.frequency, sched.limit]
         end
       end
 

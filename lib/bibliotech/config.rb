@@ -1,3 +1,5 @@
+require 'bibliotech/backups/scheduler'
+
 module BiblioTech
   class Config
     class MissingConfig < KeyError; end
@@ -230,7 +232,7 @@ module BiblioTech
       @backup_frequency ||= regularize_frequency(local_get(:backup_frequency))
     end
 
-    def each_prune_schedule
+    def prune_schedules
       local_get(:prune_schedule).map do |frequency, limit|
         real_frequency = regularize_frequency(frequency)
         unless real_frequency % backup_frequency == 0
@@ -243,11 +245,11 @@ module BiblioTech
           else
             Integer(limit)
           end
-        [real_frequency, limit]
-      end.sort_by do |frequency, limit|
+        [frequency, real_frequency, limit]
+      end.sort_by do |freq_name, frequency, limit|
         frequency
-      end.each do |frequency, limit|
-        yield(frequency, limit)
+      end.map do |freq_name, frequency, limit|
+        Backups::Scheduler.new(freq_name, frequency, limit)
       end
     end
 
