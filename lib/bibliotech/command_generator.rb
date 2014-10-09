@@ -3,11 +3,13 @@ require 'caliph'
 require 'bibliotech/builders/gzip'
 require 'bibliotech/builders/postgres'
 require 'bibliotech/builders/mysql'
+require 'bibliotech/logger'
 
 module BiblioTech
   class CommandGenerator
 
     include Caliph::CommandLineDSL
+    include Logging
 
     attr_accessor :config
 
@@ -19,14 +21,18 @@ module BiblioTech
       options = config.merge(options || {})
       command = cmd
       command = Builders::Export.for(options).go(command)
-      Builders::FileOutput.for(options).go(command)
+      Builders::FileOutput.for(options).go(command).tap do |cmd|
+        log.info{ cmd.command }
+      end
     end
 
     def import(options = nil)
       options = config.merge(options || {})
       command = cmd()
       command = Builders::Import.for(options).go(command)
-      Builders::FileInput.for(options).go(command)
+      Builders::FileInput.for(options).go(command).tap do |cmd|
+        log.info{ cmd.command }
+      end
     end
 
     def fetch(remote, filename, options = nil)
@@ -39,6 +45,8 @@ module BiblioTech
         options.optionally{ cmd.options << "-i #{options.id_file(remote)}" }
         cmd.options << options.remote_file(remote, filename)
         cmd.options << local_path
+      end.tap do |cmd|
+        log.info{ cmd.command }
       end
     end
 
@@ -47,6 +55,8 @@ module BiblioTech
       cmd("scp") do |cmd|
         cmd.options << options.local_file(filename)
         cmd.options << options.remote_file(remote, filename)
+      end.tap do |cmd|
+        log.info{ cmd.command }
       end
     end
 
@@ -74,7 +84,9 @@ module BiblioTech
             cmd.options << "-o #{opt}"
           end
         end
-      end - escaped_command(command_on_remote)
+      end - escaped_command(command_on_remote).tap do |cmd|
+        log.info{ cmd.command }
+      end
     end
 
     def wipe()

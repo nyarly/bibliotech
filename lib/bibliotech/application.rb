@@ -74,6 +74,7 @@ module BiblioTech
 
     def create_backup(options)
       time = Time.now.utc
+      log.warn{ "Creating a backup at #{time}" }
       pruner = pruner(options)
       return unless pruner.backup_needed?(time)
       options["backups"] ||= options[:backups] || {}
@@ -83,25 +84,32 @@ module BiblioTech
 
     #pull a dump from a remote
     def get(remote, options)
+      log.warn{ "Getting a dump from #{remote}" }
       @shell.run(commands.fetch(remote, options))
     end
 
     #push a dump to a remote
     def send(remote, options)
+      log.warn{ "Sending a dump to #{remote}" }
       @shell.run(commands.push(remote, options))
     end
 
     #clean up the DB dumps
     def prune(options=nil)
+      log.warn{ "Pruning DB records" }
       pruner(options || {}).go
     end
 
     #return the latest dump of the DB
     def latest(options = nil)
-      pruner(options || {}).most_recent.path
+      log.info{ "Getting most recent DB dump" }
+      pruner(options || {}).most_recent.path.tap do |latest|
+        log.info{ "  #{latest}" }
+      end
     end
 
     def remote_cli(remote, command, *options)
+      log.warn{ "Running #{command} on #{remote}" }
       @shell.run(commands.remote_cli(remote, command, *options))
     end
   end
