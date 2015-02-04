@@ -14,5 +14,4 @@ begin
     end
   end
 rescue LoadError
-  p $!
 end
