@@ -45,7 +45,7 @@ module BiblioTech
             parsed_time = Time::utc(*timespec)
             return FileRecord.new(File::join(path, file), parsed_time)
           else
-            raise "File prefixed #{prefix} doesn't match #{prefix_timestamp_re.to_s}: #{File::join(path, file)}"
+            raise "File prefixed #{prefix} doesn't match #{prefix_timestamp_re.inspect}: #{File::join(path, file)}"
           end
         else
           if file !~ TIMESTAMP_REGEX

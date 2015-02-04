@@ -5,4 +5,6 @@ gem 'corundum', "~> 0.4.1"
 gem 'pry'
 gem 'cadre'
 
+gem 'railties'
+
 gemspec :name => "BiblioTech" #points to default 'gem.gemspec'

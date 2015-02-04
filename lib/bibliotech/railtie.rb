@@ -2,7 +2,6 @@ begin
   require 'rails'
   raise LoadError unless defined? Rails
 
-
   module BiblioTech
     class Railtie < Rails::Railtie
       #XXX Consider adding Rails options for bibliotech
@@ -15,4 +14,5 @@ begin
     end
   end
 rescue LoadError
+  p $!
 end

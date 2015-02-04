@@ -39,7 +39,7 @@ module BiblioTech
     attr_writer :hash
 
     def hash
-      @hash ||= stringify_keys(valise.contents("config.yaml"))
+      @hash ||= stringify_keys(valise.exts(".yaml", ".yml").contents("config"))
     end
 
     def stringify_keys(hash) # sym -> string
