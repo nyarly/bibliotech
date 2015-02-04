@@ -2,8 +2,21 @@ require 'logger'
 
 module BiblioTech
   module Logging
+    class NullLogger < BasicObject
+      def method_missing(method, *args, &block)
+      end
+    end
+
     def self.logger
-      return @logger
+      return (@logger || null_logger)
+    end
+
+    def self.null_logger
+      @null_logger ||=
+        begin
+          warn "Logging to a NullLogger (because logger didn't get set up)"
+          NullLogger.new
+        end
     end
 
     def self.logger=(value)

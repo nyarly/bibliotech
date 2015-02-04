@@ -20,6 +20,7 @@ Possible Future Features
 * Capistrano tasks
 * Non-SQL databases
 * Management of backup transfer to S3 / Glacier / other long term storage
+* Non-database backups - e.g. snapshotting of volumes
 
 Use
 ---
@@ -30,9 +31,15 @@ Add a line like:
 
 to your Rakefile or in a lib/tasks file. You'll get some new tasks:
 
+    rake bibliotech:backups:perform[prefix]  # Run DB backups, including cleaning up the resulting backups
+    rake bibliotech:backups:restore[name]    # Restore from a named DB backup
+    rake bibliotech:remote_sync:down         # Pull the latest DB dump from the remote server into our local DB
+    rake bibliotech:remote_sync:up           # Push the latest local DB dump to the remote server's DB
+
+
 You'll probably want to add:
 
-   `* * * * * cd <project_root> && bundle exec rake bibliotech:backup`
+   `17 * * * * cd <project_root> && bundle exec rake bibliotech:backup:perform >> log/backup.log`
 
 to the appropriate crontab. Bibliotech doesn't load the whole Rails stack, so
 it's quick to run the backup task when it isn't needed.

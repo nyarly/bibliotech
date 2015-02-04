@@ -9,7 +9,7 @@ backups:
   prefix: backup
 log:
   target: stderr
-  level: debug
+  level: warn
 
 production:
   backups:

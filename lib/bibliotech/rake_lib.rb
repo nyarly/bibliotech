@@ -23,10 +23,15 @@ module BiblioTech
       configured_state = to_hash
       configured_state.delete(:app)
       configured_state.delete(:config_path)
-      case [config_path == app.config_path, configured_state == to_hash.delete(:config_path)]
-      when [false, false]
+
+      case [config_path == app.config_path, configured_state == @default_state]
       when [true, true]
-        raise "Cannot both change to config path and any other setting (sorry) - put configs in a file"
+      when [false, false]
+        raise "Won't both change config path and any other setting (sorry) - put configs in a file"
+        # The rationale here is that it would introduce two conflicting sets of
+        # configs, which would only enhance the level of confusion possible.
+        # XXX by that reasoning, if there are any non-default config files, we
+        # should reject Rakefile configs, but we don't
       when [true, false]
         app.config.hash.merge!(configured_state)
       when [false, true]

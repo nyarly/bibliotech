@@ -6,13 +6,14 @@ module BiblioTech
   describe Backups::Pruner do
     include FileSandbox
 
+    let :app do
+      App.new
+    end
+
     before :each do
       sandbox.new :directory => "db_backups"
       sandbox.new :file => '.bibliotech/config.yaml', :with_contents => "log:\n  target: ../tmp/test.log"
-    end
-
-    let :app do
-      App.new
+      app.log
     end
 
     let :schedule do

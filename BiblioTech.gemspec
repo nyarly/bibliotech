@@ -39,6 +39,7 @@ Gem::Specification.new do |spec|
     lib/bibliotech/backups/file_record.rb
     lib/bibliotech/application.rb
     lib/bibliotech/cli.rb
+    lib/bibliotech/railtie.rb
     lib/bibliotech.rb
     bin/bibliotech
     spec/spec_helper.rb

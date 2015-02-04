@@ -14,3 +14,4 @@ gh-pages/
 .sass-cache/
 .cadre/
 tmp/
+.vim-role

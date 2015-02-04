@@ -29,8 +29,23 @@ module BiblioTech
 
       def backup_needed?(time)
         most_recent = most_recent()
-        return true if most_recent.nil?
-        (time - most_recent.timestamp) > (frequency * 60)
+        log.info{ "backup_needed?: most_recent is #{most_recent.path rescue "<nil>"}" }
+        if most_recent.nil?
+          log.warn{ "backup_needed?: no backups yet -> YES" }
+          return true
+        end
+
+        difference = time - most_recent.timestamp
+        freq_seconds = frequency * 60
+        if difference >= freq_seconds
+          log.warn{ "backup_needed?: check time: #{time.inspect} most_recent timestamp: #{most_recent.timestamp.inspect}" }
+          log.warn{ "backup_needed?: delta: #{difference} frequency: #{freq_seconds} -> YES" }
+          return true
+        else
+          log.info{ "backup_needed?: check time: #{time.inspect} most_recent timestamp: #{most_recent.timestamp.inspect}" }
+          log.info{ "backup_needed?: delta: #{difference} frequency: #{freq_seconds} -> NO" }
+          return false
+        end
       end
 
       def list
@@ -59,9 +74,11 @@ module BiblioTech
           log.warn{ "No backup files in #{path} / #{name} !" }
         end
         list.each do |record|
-          log.info{
-            "#{record.path} #{record.timestamp} #{record.keep ? "kept: #{record.scheduled_by.inspect}" : "discarding"}"
-          }
+          if record.keep
+            log.info{ "#{record.path} #{record.timestamp} kept: #{record.scheduled_by.inspect}" }
+          else
+            log.warn{ "#{record.path} #{record.timestamp} discarding" }
+          end
         end
         list.select do |record|
           !record.keep?
