@@ -25,6 +25,7 @@ module BiblioTech
               rw dir
             end
             ro from_here(%w{.. default_configuration}, up_to("lib"))
+
             handle "*.yaml", :yaml, :hash_merge
             handle "*.yml", :yaml, :hash_merge
           end

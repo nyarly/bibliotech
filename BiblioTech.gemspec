@@ -1,7 +1,7 @@
 Gem::Specification.new do |spec|
   spec.name		= "bibliotech"
   #{MAJOR: incompatible}.{MINOR added feature}.{PATCH bugfix}-{LABEL}
-  spec.version		= "0.4.0"
+  spec.version		= "0.4.1"
   author_list = { "Evan Dorn" => 'evan@lrdesign.com', "Judson Lester" => 'judson@lrdesign.com' }
   spec.authors		= author_list.keys
   spec.email		= spec.authors.map {|name| author_list[name]}
@@ -73,7 +73,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency("caliph", "~> 0.3.1")
   spec.add_dependency("mattock", "~> 0.9.0")
-  spec.add_dependency("valise", "~> 1.1.1")
+  spec.add_dependency("valise", "~> 1.1.4")
   spec.add_dependency("thor", "~> 0.19.1")
 
   #spec.post_install_message = "Thanks for installing my gem!"

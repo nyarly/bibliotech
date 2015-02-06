@@ -7,6 +7,10 @@ backups:
   dir: db_backups
   compress:  gzip   # [ none, gzip, bzip2, 7zip ]
   prefix: backup
+  keep:
+    hourlies: 1
+  frequency: hourly
+
 log:
   target: stderr
   level: warn
@@ -18,7 +22,6 @@ production:
       dailies:    14
       weeklies:   8
       monthlies:  all
-    frequency: hourly
 
   database_config_env: production
 
@@ -33,8 +36,6 @@ staging:
 
   user: root
   host: some.server.com
-  backups:
-    compress: gzip
 
 development:
   database_config_env: development

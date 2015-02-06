@@ -59,6 +59,21 @@ Configuration only needs to be set for commands that use it, so if you're not
 going to doing cronjob backups, you can leave out the 'keep' schedule.
 Missing fields will be reported as errors when running a command.
 
+You can check the currently active configuration with
+
+    bibliotech config
+
+One use case supported by the load process is having a set of overall defaults
+for an application in `.bibliotech/config.yaml` and then per-environment
+configs in `config/bibliotech/config.yaml` - most commonly, the local and
+remote settings are per-enviroment, and everything else is common.
+
+Related: you may want to add a `config/bibliotech/config.yaml` to your
+deployment scripts when using bibliotech
+
+Generally, you'll want to put `.bibliotech/config.yaml' under version control
+and exclude config/bibliotech/config.yaml from version control
+
 The form of the config can be understood by reviewing the defaults:
 
     local: development #which of the following config sets is the local machine
