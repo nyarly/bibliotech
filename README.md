@@ -22,14 +22,22 @@ Possible Future Features
 * Management of backup transfer to S3 / Glacier / other long term storage
 * Non-database backups - e.g. snapshotting of volumes
 
-Use
----
+Use Cases
+----
 
-Add a line like:
+##### Quick database dumps and reload
+```
+bibliotech dump quick-dump.sql
+bibliotech load quick-dump.sql
+```
+
+##### Database backups
+
+In your `Rakefile` add a line like:
 
     BiblioTech::Tasklib.new
 
-to your Rakefile or in a lib/tasks file. You'll get some new tasks:
+You'll get some new tasks:
 
     rake bibliotech:backups:perform[prefix]  # Run DB backups, including cleaning up the resulting backups
     rake bibliotech:backups:restore[name]    # Restore from a named DB backup
@@ -43,6 +51,34 @@ You'll probably want to add:
 
 to the appropriate crontab. Bibliotech doesn't load the whole Rails stack, so
 it's quick to run the backup task when it isn't needed.
+
+Because of that, once you've updated your Rakefile, you may prefer to use the
+`backups:perform` and `backups:restore` - dump doesn't consider whether a
+backup is needed.
+
+##### Development database syncronization
+
+Check that in `config/bibliotech/config.yaml` you've got something like
+```yaml
+local: development
+remote: staging #could be production
+
+staging:
+ #you'll need to update these
+ # they're the SSH configuration to connect to the
+ # staging server
+  user: root
+  host: some.server.com
+  path: "/var/www/staging.someapp.com/current"
+```
+
+Now
+```
+rake bibliotech:remote_sync:down
+```
+
+will pull the most recent backup on the `remote` server and load it into your `local` database.
+
 
 Configuration
 -------------
