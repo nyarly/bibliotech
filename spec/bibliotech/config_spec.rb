@@ -1,63 +1,91 @@
 require 'valise'
 require 'spec_helper'
+require 'file-sandbox'
 
 module BiblioTech
   describe Config do
     include FileSandbox
 
-    describe 'initialization' do
+    describe "datatbase.yml" do
       before :each do
         sandbox.new :file => 'config/database.yml', :with_contents => YAML::dump(
           {
-          "development" =>
-          { "username" => 'root',
-            "database"  => 'dev_db',
-            "adapter"   => 'mysql',
-          },
-          "production" =>
-          { "username" => 'root',
-            "database"  => 'prod_db',
-            "adapter"   => 'mysql2',
-          }
-        })
-      end
-
-      let :valise do
-        Valise.define do
-          defaults do
-            file "config.yaml", {
-              "database_config_file" => "config/database.yml",
-              "database_config_env" => "development",
+            "development" =>
+            { "username" => 'root',
+              "database"  => 'dev_db',
+              "adapter"   => 'mysql',
+            },
+            "production" =>
+            { "username" => 'root',
+              "database"  => 'prod_db',
+              "adapter"   => 'mysql2',
             }
+          })
+      end
+
+      describe 'initialization' do
+        let :valise do
+          Valise.define do
+            defaults do
+              file "config.yaml", {
+                "database_config_file" => "config/database.yml",
+                "database_config_env" => "development",
+              }
+            end
+          end
+        end
+
+        subject :config do
+          BiblioTech::Config.new(valise)
+        end
+
+        context "if the file contains database configs" do
+          context "with default(development) environment" do
+            it "should make the development hash available at config" do
+              expect(config.database).to eql "dev_db"
+            end
+          end
+
+          context "with specified environment" do
+            it "should make the string-specified hash available at config" do
+              expect(config.merge("database_config_env" => "production").database).to eql "prod_db"
+            end
+          end
+        end
+
+        context "when the file contains bad configs" do
+          context "with no matching environment" do
+            it "should raise an error" do
+              expect do
+                config.merge("database_config_env" => "only_for_pretend").database
+              end.to raise_error(KeyError)
+            end
           end
         end
       end
 
-      subject :config do
-        BiblioTech::Config.new(valise)
-      end
-
-      context "if the file contains database configs" do
-        context "with default(development) environment" do
-          it "should make the development hash available at config" do
-            expect(config.database).to eql "dev_db"
+      describe "partial override of database.yml" do
+        let :valise do
+          Valise.define do
+            defaults do
+              file "config.yaml", {
+                "database_config_file" => "config/database.yml",
+                "database_config_env" => "development",
+                "database_config" => {
+                  "username" => "codemonkey"
+                }
+              }
+            end
           end
         end
 
-        context "with specified environment" do
-          it "should make the string-specified hash available at config" do
-            expect(config.merge("database_config_env" => "production").database).to eql "prod_db"
-          end
+        subject :config do
+          BiblioTech::Config.new(valise)
         end
-      end
 
-      context "when the file contains bad configs" do
-        context "with no matching environment" do
-          it "should raise an error" do
-            expect do
-              config.merge("database_config_env" => "only_for_pretend").database
-            end.to raise_error(KeyError)
-          end
+        it "should blend the bibliotech config and Rails config" do
+          expect(config.database).to eql("dev_db")
+          expect(config.username).to eql("codemonkey")
         end
       end
     end
@@ -83,9 +111,9 @@ module BiblioTech
         { "backups" => {
           "frequency" => 60,
           "keep" => {
-          60 => 24,
-          1440 => 7
-        }}}
+            60 => 24,
+            1440 => 7
+          }}}
       end
 
       let :schedule_array do
@@ -105,9 +133,9 @@ module BiblioTech
           { "backups" => {
             "frequency" => 59,
             "keep" => {
-            60 => 24,
-            1440 => 7
-          }}}
+              60 => 24,
+              1440 => 7
+            }}}
         end
 
         it "should raise an error" do
@@ -122,10 +150,10 @@ module BiblioTech
           { "backups" => {
             "frequency" => "sometimes",
             "keep" => {
-            "often" => 24,
-            "regular" => 7,
-            "chocolate" => 4
-          }}}
+              "often" => 24,
+              "regular" => 7,
+              "chocolate" => 4
+            }}}
         end
 
         it "should raise an error" do
@@ -140,11 +168,11 @@ module BiblioTech
           { "backups" => {
             "frequency" => "hourly",
             "keep" => {
-            "hourlies" => 24,
-            "daily" => 7,
-            "weeklies" => 4,
-            "monthly" => "all"
-          }}}
+              "hourlies" => 24,
+              "daily" => 7,
+              "weeklies" => 4,
+              "monthly" => "all"
+            }}}
         end
 
         it "should produce correct schedule" do

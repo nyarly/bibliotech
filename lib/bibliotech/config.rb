@@ -254,7 +254,11 @@ module BiblioTech
     end
 
     def database_config
-      hash["database_config"] ||=
+      local_get(:database_config)
+    end
+
+    def app_db_config
+      @app_db_config ||=
         begin
           db_config = YAML::load(File::read(local_get(:database_config_file)))
           db_config.fetch(local_get(:database_config_env)) do
@@ -262,6 +266,12 @@ module BiblioTech
             raise KeyError, "No #{local_get(:database_config_env)} in #{db_config.pretty_inspect}"
           end
         end
+    end
+
+    def db_get(field)
+      local_get(field)
+    rescue MissingConfig
+      app_db_config.fetch(steps_for(field).last)
     end
 
     #@group File management
@@ -294,33 +304,27 @@ module BiblioTech
 
     #@group Database
     def adapter
-      database_config
-      local_get(:db_adapter)
+      db_get(:db_adapter)
     end
 
     def host
-      database_config
-      local_get(:db_host)
+      db_get(:db_host)
     end
 
     def port
-      database_config
-      local_get(:db_port)
+      db_get(:db_port)
     end
 
     def username
-      database_config
-      local_get(:db_username)
+      db_get(:db_username)
     end
 
     def database
-      database_config
-      local_get(:db_database)
+      db_get(:db_database)
     end
 
     def password
-      database_config
-      local_get(:db_password)
+      db_get(:db_password)
     end
     #@endgroup
   end
