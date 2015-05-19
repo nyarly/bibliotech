@@ -17,7 +17,9 @@ module BiblioTech
     let   (:base_options){{}}
 
     let :base_config_hash do
-      { "database_config" =>
+      {
+        "local" => "production",
+        "database_config" =>
         {
           "adapter" => :postgres,
           "database" => db_name,

@@ -14,7 +14,12 @@ module BiblioTech
           config.optional{ command.env["PGPASSWORD"] = config.password }
           config.optional{ command.options << "-p #{config.port}" } #ok
 
-          command.options << "-U #{config.username}"
+          if config.local == "development"
+            config.optional{ command.options << "-U #{config.username}" }
+          else
+            command.options << "-U #{config.username}"
+          end
+
           command.options << "#{config.database}"
           command
         end
@@ -32,7 +37,12 @@ module BiblioTech
           config.optional{ command.env["PGPASSWORD"] = config.password }
           config.optional{ command.options << "-p #{config.port}" } #ok
 
-          command.options << "-U #{config.username}"
+          if config.local == "development"
+            config.optional{ command.options << "-U #{config.username}" }
+          else
+            command.options << "-U #{config.username}"
+          end
+
           command.options << "-d #{config.database}"
           command
         end
