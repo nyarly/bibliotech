@@ -44,6 +44,8 @@ module BiblioTech
     default_namespace :bibliotech
 
     def define
+      directory app.config.backup_path
+
       in_namespace do
         namespace :backups do
           desc "Restore from a named DB backup"
@@ -56,7 +58,7 @@ module BiblioTech
             app.import(options)
           end
 
-          task :create, [:prefix] do |task, args|
+          task :create, [:prefix] => app.config.backup_path do |task, args|
             options = {}
             unless args[:prefix].nil?
               options[:backups] = {:prefix => args[:prefix]}

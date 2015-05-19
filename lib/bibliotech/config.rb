@@ -270,8 +270,10 @@ module BiblioTech
 
     def db_get(field)
       local_get(field)
-    rescue MissingConfig
-      app_db_config.fetch(steps_for(field).last)
+    rescue MissingConfig => mc
+      app_db_config.fetch(steps_for(field).last) do
+        raise mc
+      end
     end
 
     #@group File management
