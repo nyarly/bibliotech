@@ -163,6 +163,41 @@ module BiblioTech
         end
       end
 
+
+      context "with 'none'" do
+        let :config_hash do
+          { "backups" => {
+            "frequency" => "daily",
+            "keep" => {
+              "hourly" => "none",
+              "daily" => "all"
+            }
+          }}
+        end
+
+        it "should not raise error" do
+          expect(schedule_array).to contain_exactly([60*24, nil])
+        end
+      end
+
+      context "accidentally empty" do
+        let :config_hash do
+          { "backups" => {
+            "frequency" => "daily",
+            "keep" => {
+              "hourly" => "none",
+              "daily" => "none"
+            }
+          }}
+        end
+
+        it "should raise an error" do
+          expect do
+            schedule_array
+          end.to raise_error
+        end
+      end
+
       context "with shorthand words" do
         let :config_hash do
           { "backups" => {

@@ -233,7 +233,9 @@ module BiblioTech
     end
 
     def prune_schedules
-      local_get(:prune_schedule).map do |frequency, limit|
+      prune_hash = local_get(:prune_schedule)
+      prune_hash.map do |frequency, limit|
+        next if limit == "none"
         real_frequency = regularize_frequency(frequency)
         unless real_frequency % backup_frequency == 0
           raise "Pruning frequency #{real_frequency}:#{frequency} is not a multiple of backup frequency: #{backup_frequency}:#{local_get(:backup_frequency)}"
@@ -246,8 +248,13 @@ module BiblioTech
             Integer(limit)
           end
         [frequency, real_frequency, limit]
-      end.sort_by do |freq_name, frequency, limit|
+      end.compact.sort_by do |freq_name, frequency, limit|
         frequency
+      end.tap do |list|
+        if list.empty?
+          require 'pp'
+          raise "No backups will be kept by prune schedule: #{prune_hash.pretty_inspect}"
+        end
       end.map do |freq_name, frequency, limit|
         Backups::Scheduler.new(freq_name, frequency, limit)
       end
