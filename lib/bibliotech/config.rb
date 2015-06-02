@@ -105,8 +105,8 @@ module BiblioTech
       steps = steps_for(key)
       steps_chain =
         begin
-          [steps, [local] + steps]
-        rescue MissingConfig
+          [[local] + steps, steps]
+        rescue MissingConfig => mc
           [steps]
         end
       extract(*steps_chain)

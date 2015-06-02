@@ -6,10 +6,11 @@ module BiblioTech
   describe Config do
     include FileSandbox
 
-    describe "datatbase.yml" do
+    describe "database.yml" do
       before :each do
         sandbox.new :file => 'config/database.yml', :with_contents => YAML::dump(
           {
+
             "development" =>
             { "username" => 'root',
               "database"  => 'dev_db',
@@ -125,6 +126,29 @@ module BiblioTech
       context "simple numerics" do
         it "should produce correct schedule" do
           expect(schedule_array).to contain_exactly([60, 24], [1440, 7])
+        end
+      end
+
+      context "environment overrides" do
+        let :config_hash do
+          { "backups" => {
+            "frequency" => 60,
+            "keep" => {
+              "hourly" => 1
+            }},
+            "production" => {
+              "backups" => {
+                "keep" => {
+                  "hourly" => 12
+                }
+              }
+            },
+            "local" => "production"
+          }
+        end
+
+        it "should prefer the local config" do
+          expect(schedule_array).to contain_exactly([60, 12])
         end
       end
 
