@@ -21,6 +21,12 @@ module BiblioTech
       app.import(:backups => { :filename => file })
     end
 
+    desc "backup", "Create a database backup if needed"
+    def backup()
+      app = App.new
+      app.create_backup
+    end
+
     desc "config", "Dumps the configuration as parsed"
     def config
       require 'yaml'
