@@ -72,7 +72,8 @@ module BiblioTech
       @shell.run(commands.export(options))
     end
 
-    def create_backup(options)
+    def create_backup(options=nil)
+      options ||= {}
       time = Time.now.utc
       log.warn{ "Creating a backup at #{time}" }
       pruner = pruner(options)
