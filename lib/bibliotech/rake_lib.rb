@@ -81,7 +81,7 @@ module BiblioTech
         namespace :remote_sync do
           desc "Pull the latest DB dump from the remote server into our local DB"
           task :down do
-            app.remote_cli(remote, "create_backup").must_succeed!
+            app.remote_cli(remote, "backup").must_succeed!
             result = app.remote_cli(remote, "latest")
             result.must_succeed!
             filename = result.stdout.chomp
