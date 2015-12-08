@@ -11,7 +11,13 @@ module BiblioTech
 
       def list
         files = []
-        Dir.new(path).each do |file|
+        begin
+          dir = Dir.new(path)
+        rescue Errno::ENOENT
+          return []
+        end
+
+        dir.each do |file|
           next if %w{. ..}.include?(file)
           file_record = build_record(file)
           if file_record.nil?
