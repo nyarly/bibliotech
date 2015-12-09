@@ -1,5 +1,6 @@
 require 'spec_helper'
 require 'pry'
+require 'file-sandbox'
 
 module BiblioTech
   describe CommandGenerator, "for mysql" do
@@ -16,7 +17,7 @@ module BiblioTech
     let( :password )  { "password123" }
     let( :host     )  { "127.0.0.1"   }
     let( :filename )  { "export.sql"  }
-    let( :path     )  { "/some/path"  }
+    let( :path     )  { "some/path"  }
 
       let :base_config_hash do
       { "database_config" => {
@@ -119,6 +120,8 @@ module BiblioTech
 
 
     describe :import do
+      include FileSandbox
+
       let :command do
         generator.import(options)
       end
@@ -127,38 +130,50 @@ module BiblioTech
         command
       end
 
+
       context 'with username, database, file, and path' do
         let :options do
           { :backups => { :filename => filename, :dir => path }}
         end
 
-        it { expect(command).to be_a(Caliph::CommandLine) }
+        it "should raise an exception if load file is missing" do
+          expect{ command }.to raise_error(/Missing/i)
+        end
 
-        it { expect(command.redirections).to eq(["0<#{path}/#{filename}"]) }
-        it { expect(command.executable).to eq('mysql')}
-        it { expect(command.options).to eq(["-u #{username}", db_name ]) }
-
-        context "plus password" do
-          let :config_hash do
-            base_config_hash.tap do |hash|
-              hash["database_config"]["password"] = password
-            end
+        context 'with existent backup file' do
+          before :each do
+            sandbox.new :file => File.join(path, filename)
+            sandbox.new :file => File.join(path, filename + '.gz')
           end
 
-          it { expect(command.options).to eq(["-u #{username}","--password='#{password}'", "#{db_name}"]) }
+          it { expect(command).to be_a(Caliph::CommandLine) }
 
-          context 'and compressor' do
-            let :options do
-              { :backups => {
-                :filename => filename + '.gz',
-                :dir => path,
-                :compress => :gzip
-              } }
+          it { expect(command.redirections).to eq(["0<#{path}/#{filename}"]) }
+          it { expect(command.executable).to eq('mysql')}
+          it { expect(command.options).to eq(["-u #{username}", db_name ]) }
+
+          context "plus password" do
+            let :config_hash do
+              base_config_hash.tap do |hash|
+                hash["database_config"]["password"] = password
+              end
             end
 
-            it { expect(command).to be_a(Caliph::PipelineChain) }
-            it { expect(first_cmd.executable).to eq('gunzip') }
-            it { expect(first_cmd.options).to eq(["-c", "#{path}/#{filename}.gz"]) }
+            it { expect(command.options).to eq(["-u #{username}","--password='#{password}'", "#{db_name}"]) }
+
+            context 'and compressor' do
+              let :options do
+                { :backups => {
+                  :filename => filename + '.gz',
+                  :dir => path,
+                  :compress => :gzip
+                } }
+              end
+
+              it { expect(command).to be_a(Caliph::PipelineChain) }
+              it { expect(first_cmd.executable).to eq('gunzip') }
+              it { expect(first_cmd.options).to eq(["-c", "#{path}/#{filename}.gz"]) }
+            end
           end
         end
       end

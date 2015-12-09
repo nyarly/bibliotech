@@ -18,7 +18,7 @@ module BiblioTech
     desc "load FILENAME", "Load a database file from FILE"
     def load(file)
       app = App.new
-      app.import(:backups => { :filename => file })
+      app.import(:backups => { :file => file })
     end
 
     desc "backup", "Create a database backup if needed"

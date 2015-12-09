@@ -26,8 +26,24 @@ module BiblioTech
       end
     end
 
-    def import(options = nil)
-      options = config.merge(options || {})
+    def import(opts = nil)
+      opts ||= {}
+      options = config.merge(opts)
+      unless File.exists?(options.backup_file)
+        filename = options.backup_file
+        opts[:backups] = opts.fetch(:backups){ opts.fetch("backups", {})}
+        opts[:filename] = filename
+
+        options = config.merge(opts)
+
+        if File.exists?(options.backup_file)
+          log.warn { "Actually restoring from #{options.backup_file} - this behavior is deprecated. In future, use explicit path."}
+        else
+          log.fatal{ "Cannot restore from database from missing file #{filename} !"}
+          raise "Missing #{filename}"
+        end
+      end
+
       command = cmd()
       command = Builders::Import.for(options).go(command)
       Builders::FileInput.for(options).go(command).tap do |cmd|

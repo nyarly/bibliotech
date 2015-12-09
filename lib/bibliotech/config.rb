@@ -1,4 +1,5 @@
 require 'bibliotech/backups/scheduler'
+require 'yaml'
 
 module BiblioTech
   class Config
