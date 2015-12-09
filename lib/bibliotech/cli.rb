@@ -3,6 +3,10 @@ require 'bibliotech/application'
 
 module BiblioTech
   class CLI < Thor
+    def self.exit_on_failure?
+      true
+    end
+
     desc "latest", "Outputs the latest DB dump available locally"
     def latest
       app = App.new(:log => { :target => "/dev/null" })
