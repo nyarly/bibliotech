@@ -26,13 +26,13 @@ module BiblioTech::Backups
         Scheduler.new("hourly", 60, nil)
       end
 
-      context "when there's more than enough backups" do
+      context "when there's superfrequent backups over 12 hours" do
         let(:interval){ 60*60*12 - test_jitter}
         let(:frequency) { 15 }
         let(:test_jitter){ 60 }
 
-        it "should mark 8 files kept" do
-          expect(kept_files.count).to eql 12
+        it "should mark 13 files kept" do
+          expect(kept_files.count).to eql 13
         end
       end
     end
@@ -84,13 +84,13 @@ module BiblioTech::Backups
         end
       end
 
-      context "when there are too few backups" do
+      context "when the total backup interval is too short" do
         let(:interval){ 60*60*4 - test_jitter }
         let(:frequency){ 60*8 }
         let(:test_jitter){ 60 }
 
-        it "should mark 4 files kept" do
-          expect(kept_files.count).to eql 4
+        it "should mark 5 files kept" do
+          expect(kept_files.count).to eql 5
         end
       end
 

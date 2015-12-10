@@ -103,7 +103,6 @@ module BiblioTech
       end
 
       it "should keep 48 hours of backup" do
-        now = Time.now.utc
         (0..47).each do |interval|
           sandbox.new :file => "db_backups/#{pruner.filename_for(Time.now.utc - interval * 60 * 60)}"
         end
@@ -122,7 +121,7 @@ module BiblioTech
           sandbox.new :file => "db_backups/#{pruner.filename_for(now - interval * 60 * 60)}"
         end
 
-        expect(pruner.pruneable.length).to eq(471 - 48 - (14 - 2) - 1) # 2 dailies hourly etc.
+        expect(pruner.pruneable.length).to eq(471 - 48 - (14 - 2) - 2) # 2 dailies hourly etc.
 
         expect(pruner.list.length).to eq(471)
       end

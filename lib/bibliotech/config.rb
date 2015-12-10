@@ -21,6 +21,7 @@ module BiblioTech
       :backup_path          => [ "backups"                , "dir"       ] ,
       :compressor           => [ "backups"                , "compress"  ] ,
       :prune_schedule       => [ "backups"                , "keep"      ] ,
+      :prune_calendar       => [ "backups"                , "calendar"  ] ,
       :backup_name          => [ "backups"                , "prefix"    ] ,
       :backup_frequency     => [ "backups"                , "frequency" ] ,
       :db_adapter           => [ "database_config"        , "adapter"   ] ,
@@ -257,6 +258,26 @@ module BiblioTech
         end
       end.map do |freq_name, frequency, limit|
         Backups::Scheduler.new(freq_name, frequency, limit)
+      end
+    end
+
+    def prune_calendar
+      calendar_hash = local_get(:prune_calendar)
+      calendar_hash.map do |pattern, limit|
+        limit =
+          case limit
+          when "all"
+            nil
+          when "none"
+            next
+          else
+            Integer(limit)
+          end
+        [pattern, limit]
+      end.compact.sort_by do |pattern, limit|
+        - pattern.length
+      end.map do |pattern, limit|
+        Backups::CalendarScheduler.new(pattern, limit)
       end
     end
 
