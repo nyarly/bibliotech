@@ -188,6 +188,14 @@ specific quarters ("first_quarter") - these are always on the first day of
 their interval. Both forms have less readable, but more flexible numeric
 versions.
 
+### The backups directory
+
+Bibliotech assumes that it has complete control over the backups directory
+(which is `db_backups` within the the project path by default). Files created
+or renamed within that directory can confuse Bibliotech, and its error messages
+in these cases can be confusing. (This is considered a bug, with discussion
+about how to address underway.) For the moment, simply avoid creating files in
+Bibliotech's directory.
 
 ## Credits
 
