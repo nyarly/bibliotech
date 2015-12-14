@@ -60,14 +60,23 @@ module BiblioTech
           schedule.frequency
         end
       end
+
+      def get_config_hash(name)
+        value = config.local_get(name)
+        if value.to_s == "none"
+          return {}
+        else
+          return value
+        end
+      end
     end
 
     class Periods < Schedules
       def config_hash
         hash = {}
 
-        config.optionally{ hash.merge! config.local_get(:legacy_prune_schedule) }
-        config.optionally{ hash.merge! config.local_get(:prune_schedule) }
+        config.optionally{ hash.merge! get_config_hash(:prune_schedule) }
+        config.optionally{ hash.merge! get_config_hash(:legacy_prune_schedule) }
         hash
       end
 
@@ -79,7 +88,7 @@ module BiblioTech
     class Calendars < Schedules
       def config_hash
         hash = {}
-        config.optionally{ hash = config.local_get(:prune_calendar) }
+        config.optionally{ hash = get_config_hash(:prune_calendar) }
         [:quarterly, :quarterlies, "quarterly", "quarterlies"].each do |qkey|
           limit = hash.delete(qkey)
           if limit

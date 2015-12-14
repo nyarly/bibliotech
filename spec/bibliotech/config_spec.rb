@@ -170,8 +170,48 @@ module BiblioTech
           }}
         end
 
+        # because it exists in deployment, and wants to be fixed
+        it "should prefer the legacy config" do
+          expect(periodic_array).to contain_exactly([60, 12], [1440, 7], [2400, 6])
+          expect(calendar_array).to contain_exactly([[1,1,1],10])
+        end
+      end
+
+      context "complete removal of calendar scedule" do
+        let :config_hash do
+          { "backups" => {
+            "frequency" => 60,
+            "retain" => {
+              "periodic" => {
+                60 => 24,
+                1440 => 7
+              },
+              "calendar" => "none"
+            }
+          }}
+        end
+
         it "should prefer the modern config" do
-          expect(periodic_array).to contain_exactly([60, 24], [1440, 7], [2400, 6])
+          expect(periodic_array).to contain_exactly([60, 24], [1440, 7])
+          expect(calendar_array).to be_empty
+        end
+      end
+
+      context "complete removal of periodic scedule" do
+        let :config_hash do
+          { "backups" => {
+            "frequency" => 60,
+            "retain" => {
+              "periodic" => "none",
+              "calendar" => {
+                [ 1,1,1 ] => 10
+              }
+            }
+          }}
+        end
+
+        it "should prefer the modern config" do
+          expect(periodic_array).to be_empty
           expect(calendar_array).to contain_exactly([[1,1,1],10])
         end
       end
