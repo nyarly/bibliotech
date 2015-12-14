@@ -1,37 +1,33 @@
-BiblioTech
-==========
+# BiblioTech
 
 Database backup and transfer management gem for web applications. (Used in Rails, but fairly agnostic.)
 
 [![Code Climate](https://codeclimate.com/github/LRDesign/BiblioTech.png)](https://codeclimate.com/github/LRDesign/BiblioTech)
 [![Build Status](http://ci.lrdesign.com/projects/2/status.png?ref=master)](http://ci.lrdesign.com/projects/2?ref=master)
 
-Features
-----------------
+## Features
 
 * Backup/dump rake tasks for SQL databases
 * Restore/import rake tasks for SQL databases
 * Configurable backup directory pruning (Keep hourly for N days, daily for M weeks, etc.)
 * Rake tasks for remote/local DB syncing
 
-Possible Future Features
------------------
+## Possible Future Features
 
 * Capistrano tasks
 * Non-SQL databases
 * Management of backup transfer to S3 / Glacier / other long term storage
 * Non-database backups - e.g. snapshotting of volumes
 
-Use Cases
-----
+## Use Cases
 
-##### Quick database dumps and reload
+### Quick database dumps and reload
 ```
 bibliotech dump quick-dump.sql
 bibliotech load quick-dump.sql
 ```
 
-##### Database backups
+### Database backups
 
 In your `Rakefile` add a line like:
 
@@ -45,9 +41,9 @@ You'll get some new tasks:
     rake bibliotech:remote_sync:up           # Push the latest local DB dump to the remote server's DB
 
 
-You'll probably want to add:
+You'll probably want to add something like:
 
-   `17 * * * * cd <project_root> && bundle exec rake bibliotech:backup:perform >> log/backup.log`
+   `17 * * * * cd <project_root> && bundle exec rake bibliotech:backup:perform`
 
 to the appropriate crontab. Bibliotech doesn't load the whole Rails stack, so
 it's quick to run the backup task when it isn't needed.
@@ -56,7 +52,7 @@ Because of that, once you've updated your Rakefile, you may prefer to use the
 `backups:perform` and `backups:restore` - dump doesn't consider whether a
 backup is needed.
 
-##### Development database syncronization
+### Development database syncronization
 
 Check that in `config/bibliotech/config.yaml` you've got something like
 ```yaml
@@ -80,8 +76,7 @@ rake bibliotech:remote_sync:down
 will pull the most recent backup on the `remote` server and load it into your `local` database.
 
 
-Configuration
--------------
+## Configuration
 
 The primary way to configure Bibliotech is by putting config.yaml files in its
 search path `(/etc/bibliotech /usr/share/bibliotech ~/.bibliotech ./.bibliotech
@@ -110,32 +105,39 @@ deployment scripts when using bibliotech
 Generally, you'll want to put `.bibliotech/config.yaml' under version control
 and exclude config/bibliotech/config.yaml from version control
 
-The form of the config can be understood by reviewing the defaults:
+The overall form of the config can be understood by reviewing the defaults:
 
-    local: development #which of the following config sets is the local machine
-    remote: staging    #likewise, which remote server you're interested in
+    local: development
+    remote: staging
 
     #defaults
     database_config_file: 'config/database.yml'   # this is the default
+    backups:
+      dir: db_backups
+      compress:  gzip   # [ none, gzip, bzip2, 7zip ]
+      prefix: backup
+      retain:
+        periodic:
+          hourlies: 1
+      frequency: hourly
+
+    log:
+      target: log/backups.log
+      level: warn
 
     production:
       backups:
-        dir: db_backups
-        compress:  gzip   # [ none, gzip, bzip2, 7zip ]
-        prefix: backup
+        retain:
+          periodic:
+            hourlies:   48
+            dailies:    14
+            weeklies:   8
+          calendar:
+            monthlies: 12
+            quarterly: all
 
-        frequency: hourly
-        keep:
-          hourlies:   24
-          dailies:    7
-          weeklies:   4
-          monthlies:  all
-
-      #this assumes Rails style database.yml - you can instead
-      #use a database_config: entry with a verbatim mapping
       database_config_env: production
 
-      #SSH access to this server
       user: root
       host: some.server.com
       path: "/var/www/someapp.com/current"
@@ -143,22 +145,50 @@ The form of the config can be understood by reviewing the defaults:
 
     staging:
       database_config_env: staging
+      path: "/var/www/staging.someapp.com/current"
 
       user: root
       host: some.server.com
-      path: "/var/www/staging.someapp.com/current"
-
-      backups:
-        compress: gzip
 
     development:
+      log:
+        target: stderr
       database_config_env: development
       path: "."
       rsa_files:
         staging: "id_rsa"
         production: "id_rsa"
 
-Credits
--------
+### Backup frequency and retention
+
+Bibliotech does not, itself, run on any regular schedule. That's why you'll
+need to configure a cronjob to do that.
+
+All durations and times in Bibliotech are considered at a minute-level
+precision. Whenever a number is used for e.g. backup frequency, it is a number
+of minutes (as opposed to seconds or hours etc).
+
+Whenever it's run, Bibliotech checks the appropriate `backups>frequency`
+setting, and compares that to the most recent backup, creating a new backup if
+the elapsed time is longer than the frequency.
+
+Then Bibliotech considers the retention schedule. Without limits on retention,
+backups would grow without bound, and eventually consume all available storage.
+
+The `backups>retain>periodic` and `backups>retain>calender` settings determine
+which backups will be retained. In all cases, the sense of an entry like
+`interval: count` is "Keep the most recent <count> backups separated by
+<interval>." Bibliotech tries very hard to keep the best, most stable version
+of these backups.
+
+The preferred method of specifying backups is using their English names: the
+period names are: `hourly daily weekly monthly yearly` (or their plural forms,
+like `hourlies`). Calendar intervals are `daily monthly quarterly` plus
+specific quarters ("first_quarter") - these are always on the first day of
+their interval. Both forms have less readable, but more flexible numeric
+versions.
+
+
+## Credits
 
 Evan Dorn and Judson Lester of Logical Reality Design, Inc.

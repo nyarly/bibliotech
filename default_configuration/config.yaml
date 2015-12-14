@@ -7,23 +7,25 @@ backups:
   dir: db_backups
   compress:  gzip   # [ none, gzip, bzip2, 7zip ]
   prefix: backup
-  keep:
-    hourlies: 1
+  retain:
+    periodic:
+      hourlies: 1
   frequency: hourly
 
 log:
-  target: stderr
+  target: log/backups.log
   level: warn
 
 production:
   backups:
-    keep:
-      hourlies:   48
-      dailies:    14
-      weeklies:   8
-    calendar:
-      monthlies: 12
-      quarterly: all
+    retain:
+      periodic:
+        hourlies:   48
+        dailies:    14
+        weeklies:   8
+      calendar:
+        monthlies: 12
+        quarterly: all
 
   database_config_env: production
 
@@ -40,6 +42,8 @@ staging:
   host: some.server.com
 
 development:
+  log:
+    target: stderr
   database_config_env: development
   path: "."
   rsa_files:
