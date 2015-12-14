@@ -101,7 +101,7 @@ module BiblioTech
       end
     end
 
-    describe "schedule shorthands" do
+    describe "schedule configuration" do
       let :config do
         Config.new(nil).tap do |config|
           config.hash =  config_hash
@@ -111,21 +111,68 @@ module BiblioTech
       let :config_hash do
         { "backups" => {
           "frequency" => 60,
-          "keep" => {
-            60 => 24,
-            1440 => 7
-          }}}
+          "retain" => {
+            "periodic" => {
+              60 => 24,
+              1440 => 7
+            },
+            "calendar" => {
+              [ 1,1,1 ] => 10
+            }
+          }
+        }}
       end
 
-      let :schedule_array do
-        config.prune_schedules.map do |sched|
+      let :all_schedules do
+        config.prune_schedules
+      end
+
+      let :periodic_array do
+        all_schedules.find_all{|sch| sch.class == Backups::Scheduler}.map do |sched|
           [sched.frequency, sched.limit]
+        end
+      end
+
+      let :calendar_array do
+        all_schedules.find_all{|sch| sch.is_a? Backups::CalendarScheduler}.map do |sched|
+          [sched.pattern, sched.limit]
         end
       end
 
       context "simple numerics" do
         it "should produce correct schedule" do
-          expect(schedule_array).to contain_exactly([60, 24], [1440, 7])
+          expect(periodic_array).to contain_exactly([60, 24], [1440, 7])
+          expect(calendar_array).to contain_exactly([[1,1,1],10])
+        end
+      end
+
+      context "legacy overrides" do
+        let :config_hash do
+          { "backups" => {
+            "frequency" => 60,
+            "keep" => {
+              60 => 12,
+              2400 => 6
+            },
+            "calendar" => {
+              [ 1,1,1 ] => 8,
+              [ 2,1,1 ] => 8
+            },
+            "retain" => {
+              "periodic" => {
+                60 => 24,
+                1440 => 7
+              },
+              "calendar" => {
+                [ 1,1,1 ] => 10
+              }
+            }
+          }}
+        end
+
+        it "should prefer the modern config" do
+          expect(periodic_array).to contain_exactly([60, 24], [1440, 7], [2400, 6])
+          expect(calendar_array).to contain_exactly([[1,1,1],10])
         end
       end
 
@@ -148,7 +195,7 @@ module BiblioTech
         end
 
         it "should prefer the local config" do
-          expect(schedule_array).to contain_exactly([60, 12])
+          expect(periodic_array).to contain_exactly([60, 12])
         end
       end
 
@@ -164,7 +211,7 @@ module BiblioTech
 
         it "should raise an error" do
           expect do
-            schedule_array
+            periodic_array
           end.to raise_error(/59/)
         end
       end
@@ -182,7 +229,7 @@ module BiblioTech
 
         it "should raise an error" do
           expect do
-            schedule_array
+            periodic_array
           end.to raise_error
         end
       end
@@ -200,7 +247,7 @@ module BiblioTech
         end
 
         it "should not raise error" do
-          expect(schedule_array).to contain_exactly([60*24, nil])
+          expect(periodic_array).to contain_exactly([60*24, nil])
         end
       end
 
@@ -217,7 +264,7 @@ module BiblioTech
 
         it "should raise an error" do
           expect do
-            schedule_array
+            periodic_array
           end.to raise_error
         end
       end
@@ -226,16 +273,26 @@ module BiblioTech
         let :config_hash do
           { "backups" => {
             "frequency" => "hourly",
-            "keep" => {
-              "hourlies" => 24,
-              "daily" => 7,
-              "weeklies" => 4,
-              "monthly" => "all"
-            }}}
+            "retain" => {
+              "periodic" => {
+                "hourlies" => 24,
+                "daily" => 7,
+                "weeklies" => 4,
+                "monthly" => "all"
+              },
+              "calendar" => {
+                "monthly" => 12,
+                "quarterly" => "all"
+              }
+            }
+          }}
         end
 
         it "should produce correct schedule" do
-          expect(schedule_array).to contain_exactly([60, 24], [60*24, 7], [60*24*7, 4], [60*24*30, nil])
+          expect(periodic_array).to contain_exactly([60, 24], [60*24, 7], [60*24*7, 4], [60*24*30, nil])
+          expect(calendar_array).to contain_exactly(
+            [[1,0,0],12], [[1,1,0,0],nil],[[4,1,0,0],nil],[[7,1,0,0],nil], [[10,1,0,0],nil]
+          )
         end
       end
     end

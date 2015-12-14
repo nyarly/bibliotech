@@ -6,16 +6,16 @@ module BiblioTech::Backups
       it "[]" do
         expect(CalendarScheduler.new([], nil).name).to eq "every-minute"
       end
-      it "[]" do
+      it "[9]" do
         expect(CalendarScheduler.new([9], nil).name).to eq "Hourly at :09"
       end
-      it "[]" do
+      it "[3,9]" do
         expect(CalendarScheduler.new([3,9], nil).name).to eq "Daily at 03:09"
       end
-      it "[]" do
+      it "[10, 3, 9]" do
         expect(CalendarScheduler.new([10,3,9], nil).name).to eq "Monthly on day 10, at 03:09"
       end
-      it "[5,10,3,0]" do
+      it "[5,10,3, 9]" do
         expect(CalendarScheduler.new([5,10,3,9], nil).name).to eq "Yearly: May 10, at 03:09"
       end
     end

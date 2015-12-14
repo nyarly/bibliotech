@@ -21,14 +21,9 @@ production:
       hourlies:   48
       dailies:    14
       weeklies:   8
-      monthlies:  all
     calendar:
-      [ 1, 0, 0 ]:      12  # most recent 12 monthly on the first at midnight
-      [ 12, 0 ]:        31  # most recent 31, at noon each day
-      [ 1, 1, 0, 0 ]:   all # quarterly, forever
-      [ 4, 1, 0, 0 ]:   all
-      [ 7, 1, 0, 0 ]:   all
-      [ 10, 1, 0, 0 ]:  all
+      monthlies: 12
+      quarterly: all
 
   database_config_env: production
 
