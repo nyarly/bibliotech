@@ -5,32 +5,32 @@ module BiblioTech
     class MissingConfig < KeyError; end
 
     CONFIG_STEPS = {
-      :database_config_file  => [ "database_config_file" ] ,
-      :database_config_env   => [ "database_config_env"  ] ,
-      :root_path             => [ "path" ]                 ,
-      :host                  => [ "host" ]                 ,
-      :port                  => [ "port" ]                 ,
-      :user                  => [ "user" ]                 ,
-      :rsa_files             => [ "rsa_files" ]            ,
-      :ssh_options           => [ "ssh_options" ]          ,
-      :fetch_dir             => [ "fetched_dir" ]          ,
-      :log_target            => [ "log"                    , "target"    ] ,
-      :log_level             => [ "log"                    , "level"     ] ,
-      :file                  => [ "backups"                , "file"      ] ,
-      :filename              => [ "backups"                , "filename"  ] ,
-      :backup_path           => [ "backups"                , "dir"       ] ,
-      :compressor            => [ "backups"                , "compress"  ] ,
+      :database_config_file => [ "database_config_file" ] ,
+      :database_config_env  => [ "database_config_env"  ] ,
+      :root_path            => [ "path" ]                 ,
+      :host                 => [ "host" ]                 ,
+      :port                 => [ "port" ]                 ,
+      :user                 => [ "user" ]                 ,
+      :rsa_files            => [ "rsa_files" ]            ,
+      :ssh_options          => [ "ssh_options" ]          ,
+      :fetch_dir            => [ "fetched_dir" ]          ,
+      :log_target           => [ "log"                    , "target"    ],
+      :log_level            => [ "log"                    , "level"     ],
+      :file                 => [ "backups"                , "file"      ] ,
+      :filename             => [ "backups"                , "filename"  ] ,
+      :backup_path          => [ "backups"                , "dir"       ] ,
+      :compressor           => [ "backups"                , "compress"  ] ,
       :legacy_prune_schedule => [ "backups"                , "keep"      ] ,
       :prune_schedule        => [ "backups"                , "retain"      , "periodic" ]  ,
       :prune_calendar        => [ "backups"                , "retain"      , "calendar"  ] ,
-      :backup_name           => [ "backups"                , "prefix"    ] ,
-      :backup_frequency      => [ "backups"                , "frequency" ] ,
-      :db_adapter            => [ "database_config"        , "adapter"   ] ,
-      :db_host               => [ "database_config"        , "host"      ] ,
-      :db_port               => [ "database_config"        , "port"      ] ,
-      :db_database           => [ "database_config"        , "database"  ] ,
-      :db_username           => [ "database_config"        , "username"  ] ,
-      :db_password           => [ "database_config"        , "password"  ] ,
+      :backup_name          => [ "backups"                , "prefix"    ] ,
+      :backup_frequency     => [ "backups"                , "frequency" ] ,
+      :db_adapter           => [ "database_config"        , "adapter"   ] ,
+      :db_host              => [ "database_config"        , "host"      ] ,
+      :db_port              => [ "database_config"        , "port"      ] ,
+      :db_database          => [ "database_config"        , "database"  ] ,
+      :db_username          => [ "database_config"        , "username"  ] ,
+      :db_password          => [ "database_config"        , "password"  ] ,
     }
 
     def initialize(valise)
@@ -210,12 +210,13 @@ module BiblioTech
       local_get(:backup_name)
     end
 
+
     def prune_schedules
       list = Periods.new(self).schedules + Calendars.new(self).schedules
-      if list.empty?
-        require 'pp'
-        raise "No backups will be kept by prune schedule: #{prune_hash.pretty_inspect}"
-      end
+        if list.empty?
+          require 'pp'
+          raise "No backups will be kept by prune schedule: #{prune_hash.pretty_inspect}"
+        end
       list
     end
 

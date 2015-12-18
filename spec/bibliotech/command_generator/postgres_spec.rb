@@ -1,6 +1,9 @@
 require 'spec_helper'
+require 'file-sandbox'
 
 module BiblioTech
+  include FileSandbox
+
   describe CommandGenerator do
     let :generator do
       CommandGenerator.new(config)
@@ -11,7 +14,7 @@ module BiblioTech
     let   (:password){   "password123"   }
     let   (:host){       "127.0.0.1"     }
     let   (:filename){   "export.pg"     }
-    let   (:path){       "/some/path"    }
+    let   (:path){       "some/path"    }
 
 
     let   (:base_options){{}}
@@ -135,6 +138,8 @@ module BiblioTech
 
 
     describe :import do
+      include FileSandbox
+
       let :command do
         generator.import(options)
       end
@@ -148,32 +153,43 @@ module BiblioTech
           base_options.merge(:backups => { :filename => filename, :dir => path })
         end
 
-        it { expect(command.redirections).to eq(["0<#{path}/#{filename}"]) }
-        it { expect(command.executable).to eq('pg_restore')}
-        it { expect(command.options).to eq(["-Oc", "-U #{username}", "-d #{db_name}" ]) }
+        it "should raise an exception if load file is missing" do
+          expect{ command }.to raise_error(/Missing/i)
+        end
 
-        context "plus password" do
-          let :config_hash do
-            base_config_hash.tap do |hash|
-              hash["database_config"]["password"] = password
-            end
+        context "where file exists" do
+          before :each do
+            sandbox.new :file => File.join(path, filename)
+            sandbox.new :file => File.join(path, filename + '.gz')
           end
 
-          it { expect(command.options).to eq(["-Oc", "-U #{username}", "-d #{db_name}"]) }
-          it { expect(command.env['PGPASSWORD']).to eq(password) }
+          it { expect(command.redirections).to eq(["0<#{path}/#{filename}"]) }
+          it { expect(command.executable).to eq('pg_restore')}
+          it { expect(command.options).to eq(["-Oc", "-U #{username}", "-d #{db_name}" ]) }
 
-          context 'and compressor' do
-            let :options do
-              base_options.merge(:backups => {
-                :filename => filename + '.gz',
-                :dir => path,
-                :compressor => :gzip
-              })
+          context "plus password" do
+            let :config_hash do
+              base_config_hash.tap do |hash|
+                hash["database_config"]["password"] = password
+              end
             end
 
-            it { expect(command).to be_a(Caliph::PipelineChain) }
-            it { expect(first_cmd.executable).to eq('gunzip') }
-            it { expect(first_cmd.options).to eq(["-c", "#{path}/#{filename}.gz"]) }
+            it { expect(command.options).to eq(["-Oc", "-U #{username}", "-d #{db_name}"]) }
+            it { expect(command.env['PGPASSWORD']).to eq(password) }
+
+            context 'and compressor' do
+              let :options do
+                base_options.merge(:backups => {
+                  :filename => filename + '.gz',
+                  :dir => path,
+                  :compressor => :gzip
+                })
+              end
+
+              it { expect(command).to be_a(Caliph::PipelineChain) }
+              it { expect(first_cmd.executable).to eq('gunzip') }
+              it { expect(first_cmd.options).to eq(["-c", "#{path}/#{filename}.gz"]) }
+            end
           end
         end
       end
