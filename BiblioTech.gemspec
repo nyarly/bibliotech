@@ -25,6 +25,7 @@ Gem::Specification.new do |spec|
     lib/bibliotech/builders/postgres.rb
     lib/bibliotech/builders/mysql.rb
     lib/bibliotech/config.rb
+    lib/bibliotech/config/schedule.rb
     lib/bibliotech/logger.rb
     lib/bibliotech/command_runner.rb
     lib/bibliotech/command_generator.rb
@@ -34,6 +35,7 @@ Gem::Specification.new do |spec|
     lib/bibliotech/compression/gzip.rb
     lib/bibliotech/compression/sevenzip.rb
     lib/bibliotech/backups/scheduler.rb
+    lib/bibliotech/backups/calendar_scheduler.rb
     lib/bibliotech/backups/pruner.rb
     lib/bibliotech/backups/prune_list.rb
     lib/bibliotech/backups/file_record.rb
