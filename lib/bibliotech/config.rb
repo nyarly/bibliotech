@@ -220,6 +220,10 @@ module BiblioTech
       list
     end
 
+    def backup_frequency
+      Periods.new(self).backup_frequency
+    end
+
     def database_config
       local_get(:database_config)
     end
