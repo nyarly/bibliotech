@@ -35,6 +35,14 @@ module BiblioTech
         file_list.first.timestamp
       end
 
+      def step_back(time)
+        time - freq_seconds
+      end
+
+      def step_forward(time)
+        time + freq_seconds
+      end
+
       # Working from the latest time backwards, mark the closest file to the
       # appropriate frequencies as keepable
       def mark(original_file_list)
@@ -42,19 +50,24 @@ module BiblioTech
 
         time = latest_time(file_list)
         earliest_time = compute_earliest_time(file_list)
+        oldest_file = file_list.last
+
         while time > earliest_time do
           file_list.delete_if do |record|
             record.timestamp > time
           end
 
-          break if file_list.empty?
+          if file_list.empty?
+            oldest_file.in_schedule(name)
+            break
+          end
 
           closest = file_list.first
 
           if (time - closest.timestamp) < freq_seconds
             closest.in_schedule(name)
           end
-          time -= freq_seconds
+          time = step_back(time)
         end
         return original_file_list
       end

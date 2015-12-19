@@ -1,5 +1,4 @@
-require 'bibliotech/backups/scheduler'
-require 'yaml'
+require 'bibliotech/config/schedule'
 
 module BiblioTech
   class Config
@@ -21,7 +20,9 @@ module BiblioTech
       :filename             => [ "backups"                , "filename"  ] ,
       :backup_path          => [ "backups"                , "dir"       ] ,
       :compressor           => [ "backups"                , "compress"  ] ,
-      :prune_schedule       => [ "backups"                , "keep"      ] ,
+      :legacy_prune_schedule => [ "backups"                , "keep"      ] ,
+      :prune_schedule        => [ "backups"                , "retain"      , "periodic" ]  ,
+      :prune_calendar        => [ "backups"                , "retain"      , "calendar"  ] ,
       :backup_name          => [ "backups"                , "prefix"    ] ,
       :backup_frequency     => [ "backups"                , "frequency" ] ,
       :db_adapter           => [ "database_config"        , "adapter"   ] ,
@@ -205,60 +206,18 @@ module BiblioTech
       File::join(remote_path(remote), filename)
     end
 
-    SCHEDULE_SHORTHANDS = {
-      "hourly"      => 60,
-      "hourlies"    => 60,
-      "daily"       => 60 * 24,
-      "dailies"     => 60 * 24,
-      "weekly"      => 60 * 24 * 7,
-      "weeklies"    => 60 * 24 * 7,
-      "monthly"     => 60 * 24 * 30,
-      "monthlies"   => 60 * 24 * 30,
-      "quarterly"   => 60 * 24 * 120,
-      "quarterlies" => 60 * 24 * 120,
-      "yearly"      => 60 * 24 * 365,
-      "yearlies"    => 60 * 24 * 365,
-    }
-    def regularize_frequency(frequency)
-      Integer( SCHEDULE_SHORTHANDS.fetch(frequency){ frequency } )
-    rescue ArgumentError
-      raise "#{frequency.inspect} is neither a number of minutes or a shorthand. Try:\n  #{SCHEDULE_SHORTHANDS.keys.join(" ")}"
-    end
-
     def backup_name
       local_get(:backup_name)
     end
 
-    def backup_frequency
-      @backup_frequency ||= regularize_frequency(local_get(:backup_frequency))
-    end
 
     def prune_schedules
-      prune_hash = local_get(:prune_schedule)
-      prune_hash.map do |frequency, limit|
-        next if limit == "none"
-        real_frequency = regularize_frequency(frequency)
-        unless real_frequency % backup_frequency == 0
-          raise "Pruning frequency #{real_frequency}:#{frequency} is not a multiple of backup frequency: #{backup_frequency}:#{local_get(:backup_frequency)}"
-        end
-        limit =
-          case limit
-          when "all"
-            nil
-          else
-            Integer(limit)
-          end
-        [frequency, real_frequency, limit]
-      end.compact.sort_by do |freq_name, frequency, limit|
-        frequency
-      end.tap do |list|
+      list = Periods.new(self).schedules + Calendars.new(self).schedules
         if list.empty?
           require 'pp'
           raise "No backups will be kept by prune schedule: #{prune_hash.pretty_inspect}"
         end
-      end.map do |freq_name, frequency, limit|
-        Backups::Scheduler.new(freq_name, frequency, limit)
-      end
+      list
     end
 
     def database_config
